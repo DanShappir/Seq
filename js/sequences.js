@@ -76,7 +76,7 @@ var sequences;
         }
     }
 
-    Object.defineProperties(Object.getPrototypeOf(proto), {
+    Object.defineProperties(proto, {
         forEach: {
             writable: true,
             value: function forEach(callback, thisArg) {
