@@ -14,7 +14,11 @@
         document.body.appendChild(div);
     }
 
-    sequences.numbers.tee(function (g) {
-        g.filter(isOdd).head(10).forEach(show);
-    }).exclude(isOdd).head(10).forEach(show);
+    //sequences.numbers().skip(10).head(10).tee(function (g) {
+    //    g.filter(isOdd).forEach(show);
+    //}).exclude(isOdd).forEach(show);
+
+    //sequences.numbers().head(10).loop().head(42).forEach(show);
+
+    sequences.numbers().head(10).concat(sequences.numbers().head(10)).forEach(show);
 }());
