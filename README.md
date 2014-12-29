@@ -14,4 +14,8 @@ To list the first ten even numbers. Or alternatively:
 ```javascript
 Sequences.numbers.filter((v) => v % 2).head(10).forEach(console.log.bind(console));
 ```
-Assuming support for arrow functions.
+assuming support for arrow functions. Now isn't that nice!
+
+As an interesting sideeffect, the Sequences library essentially eliminates the need for iterators, since all the iteration methods are applied directly on the generators.
+
+## Installation
