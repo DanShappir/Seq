@@ -1,8 +1,10 @@
-var sequences;
-(function (sequences) {
+var Sequences;
+(function (Sequences) {
     'use strict';
 
-    Object.defineProperties(sequences, {
+    var iterSymbol = self.Symbol ? Symbol.iterator : "@@iterator";
+
+    Object.defineProperties(Sequences, {
         numbers: {
             writable: true,
             value: function numbers(initialValue) {
@@ -23,6 +25,15 @@ var sequences;
         toGenerator: {
             writable: true,
             value: function toGenerator(source, initialValue) {
+                var iter = source[iterSymbol]();
+                if (iter) {
+                    return function* generatorFromIterator() {
+                        yield* iter;
+                    };
+                }
+                if (Sequences.isGenerator(source)) {
+                    return source;
+                }
                 if (typeof source === 'function') {
                     return function* generatorFromFunction() {
                         var r = initialValue;
@@ -47,12 +58,15 @@ var sequences;
                         }
                     };
                 }
-                if (source && typeof source === 'object') {
-                    return function* generatorFromObject() {
-                        for (var p in source) {
-                            yield [p, source[p]];
-                        }
-                    };
+                if (typeof source === 'object' && source) {
+                    return typeof source.next === 'function' ?
+                        function* generatorFromIterator2() {
+                            yield* source;
+                        } : function* generatorFromObject() {
+                            for (var p in source) {
+                                yield [p, source[p]];
+                            }
+                        };
                 }
                 return function* generatorFromValue() {
                     yield source;
@@ -61,7 +75,7 @@ var sequences;
         }
     });
 
-    var proto = Object.getPrototypeOf(sequences.numbers());
+    var proto = Object.getPrototypeOf(Sequences.numbers());
 
     function filterFunction(value, thisArg) {
         return typeof value === 'function' ?
@@ -177,7 +191,7 @@ var sequences;
                 var self = this();
                 return function* () {
                     for (var i of self()) {
-                        if (sequences.isGenerator(i)) {
+                        if (Sequences.isGenerator(i)) {
                             yield* i.flatten()();
                         } else {
                             yield i;
@@ -201,7 +215,7 @@ var sequences;
         concat: {
             writable: true,
             value: function concat() {
-                var args = Array.prototype.slice.apply(arguments).filter(sequences.isGenerator);
+                var args = Array.prototype.slice.apply(arguments).filter(Sequences.isGenerator);
                 var self = this;
                 return function* () {
                     yield* self();
@@ -224,7 +238,7 @@ var sequences;
         tee: {
             writable: true,
             value: function tee() {
-                sequences.toGenerator(arguments).filter(function (arg) {
+                Sequences.toGenerator(arguments).filter(function (arg) {
                     return typeof arg === 'function';
                 }).forEach(function (arg) {
                     arg(this);
@@ -241,4 +255,4 @@ var sequences;
             }
         }
     });
-}(sequences || (sequences = {})));
+}(Sequences || (Sequences = {})));

@@ -4,21 +4,26 @@
 (function () {
     'use strict';
 
-    function isOdd(v) {
-        return v % 2;
-    }
-
     function show(v) {
         var div = document.createElement('div');
         div.textContent = v;
         document.body.appendChild(div);
     }
 
-    //sequences.numbers().skip(10).head(10).tee(function (g) {
-    //    g.filter(isOdd).forEach(show);
-    //}).exclude(isOdd).forEach(show);
+    function isOdd(v) {
+        return v % 2;
+    }
 
-    //sequences.numbers().head(10).loop().head(42).forEach(show);
+    var x = Sequences.toGenerator([1,2,3][Symbol.iterator]());
+    for (var i of x()) {
+        console.log(i);
+    }
 
-    sequences.numbers().head(10).concat(sequences.numbers().head(10)).forEach(show);
+    Sequences.numbers().skip(10).head(10).tee(function (g) {
+        g.filter(isOdd).forEach(show);
+    }).exclude(isOdd).forEach(show);
+
+    show('---');
+
+    Sequences.numbers().head(5).loop().head(12).forEach(show);
 }());
