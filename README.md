@@ -56,8 +56,11 @@ function sumNumbers() {
     .filter(function (arg) { return typeof arg === 'number'; })
     .reduce(function (sum, arg) { return sum + arg; }, 0);
 }
-console.log(sumNumbers(1, 2, 'hello', 3)); // 6
+console.log(sumNumbers(1, 2, 'hello', 3)); // outputs 6
 ```
 
-### Sequences.number()
+### Sequences.numbers()
 Helper function that returns a generator that emits a sequence of integers, by default 0, 1, 2, ... You can optionaly specify a start value as a first argument. By default the start value is 0. You can also specify a step size. By default the step size is 1.
+```javascript
+console.log(Sequences.numbers(2, 2).head(5).toArray()); // outputs [2, 4, 6, 8, 10]
+```
