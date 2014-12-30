@@ -7,11 +7,12 @@ var Sequences;
     Object.defineProperties(Sequences, {
         numbers: {
             writable: true,
-            value: function numbers(initialValue) {
+            value: function numbers(initialValue, step) {
                 return function* () {
                     var n = initialValue || 0;
+                    step || (step = 1);
                     while (true) {
-                        yield n++;
+                        yield n += step;
                     }
                 };
             }
