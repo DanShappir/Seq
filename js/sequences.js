@@ -26,48 +26,43 @@ var Sequences;
         toGenerator: {
             writable: true,
             value: function toGenerator(source, initialValue) {
-                var iter = source[iterSymbol]();
-                if (iter) {
-                    return function* generatorFromIterator() {
-                        yield* iter;
-                    };
-                }
-                if (Sequences.isGenerator(source)) {
-                    return source;
-                }
-                if (typeof source === 'function') {
-                    return function* generatorFromFunction() {
-                        var r = initialValue;
-                        while (true) {
-                            r = source(r);
-                            if (r && ('value' in r) && ('done' in r)) {
-                                if (r.done) {
-                                    break;
-                                }
-                                yield r.value;
-                            } else {
-                                yield r;
-                            }
-                        }
-                    };
-                }
-                if (typeof source.length === 'number') {
-                    return function* generatorFromCollection() {
-                        var i = initialValue || 0;
-                        for (; i < source.length; ++i) {
-                            yield source[i];
-                        }
-                    };
-                }
-                if (typeof source === 'object' && source) {
-                    return typeof source.next === 'function' ?
-                        function* generatorFromIterator2() {
+                if (source) {
+                    if (typeof source.next === 'function') { // Source is an iterator
+                        return function* generatorFromIterator() {
                             yield* source;
-                        } : function* generatorFromObject() {
-                            for (var p in source) {
-                                yield [p, source[p]];
+                        };
+                    }
+                    var generator = source[iterSymbol];
+                    if (Sequences.isGenerator(generator)) {
+                        return generator;
+                    }
+                    if (Sequences.isGenerator(source)) {
+                        return source;
+                    }
+                    if (typeof source === 'function') {
+                        return function* generatorFromFunction() {
+                            var r = initialValue;
+                            while (true) {
+                                r = source(r);
+                                if (r && ('value' in r) && ('done' in r)) {
+                                    if (r.done) {
+                                        break;
+                                    }
+                                    yield r.value;
+                                } else {
+                                    yield r;
+                                }
                             }
                         };
+                    }
+                    if (typeof source.length === 'number') {
+                        return function* generatorFromCollection() {
+                            var i = initialValue || 0;
+                            for (; i < source.length; ++i) {
+                                yield source[i];
+                            }
+                        };
+                    }
                 }
                 return function* generatorFromValue() {
                     yield source;
@@ -91,6 +86,19 @@ var Sequences;
         }
     }
 
+    (function () {
+        var numbers = Sequences.numbers.bind();
+        if (!Sequences.isGenerator(numbers)) {
+            var origBind = Sequences.numbers.bind;
+            Object.defineProperty(proto, 'bind', {
+                writable: true,
+                value: function bind() {
+                    return Object.setPrototypeOf(origBind.apply(this, arguments), proto);
+                }
+            });
+        }
+    }());
+
     Object.defineProperties(proto, {
         forEach: {
             writable: true,
@@ -104,15 +112,14 @@ var Sequences;
             writable: true,
             value: function until(callback, thisArg) {
                 callback = filterFunction(callback, thisArg);
-                var self = this;
                 return function* () {
-                    for (var i of self()) {
+                    for (var i of this()) {
                         if (callback(i) === true) {
                             break;
                         }
                         yield i;
                     }
-                };
+                }.bind(this);
             }
         },
         asLongAs: {
@@ -126,30 +133,28 @@ var Sequences;
             writable: true,
             value: function head(length) {
                 length || (length = 1);
-                var self = this;
                 return function* () {
                     var counter = 0;
-                    for (var i of self()) {
+                    for (var i of this()) {
                         if (++counter > length) {
                             break;
                         }
                         yield i;
                     }
-                };
+                }.bind(this);
             }
         },
         filter: {
             writable: true,
             value: function filter(callback, thisArg) {
                 callback = filterFunction(callback, thisArg);
-                var self = this;
                 return function* () {
-                    for (var i of self()) {
+                    for (var i of this()) {
                         if (callback(i)) {
                             yield i;
                         }
                     }
-                };
+                }.bind(this);
             }
         },
         exclude: {
@@ -163,67 +168,63 @@ var Sequences;
             writable: true,
             value: function skip(number) {
                 number || (number = 1);
-                var self = this;
                 return function* () {
-                    var iter = self();
+                    var iter = this();
                     var counter = 0;
                     for (var i of iter) {
                         if (++counter > number) {
                             yield i;
                         }
                     }
-                };
+                }.bind(this);
             }
         },
         map: {
             writable: true,
             value: function map(callback, thisArg) {
-                var self = this;
                 return function* () {
-                    for (var i of self()) {
+                    for (var i of this()) {
                         yield callback.call(thisArg, i);
                     }
-                };
+                }.bind(this);
             }
         },
         flatten: {
             writable: true,
             value: function flatten() {
-                var self = this();
                 return function* () {
-                    for (var i of self()) {
-                        if (Sequences.isGenerator(i)) {
-                            yield* i.flatten()();
-                        } else {
+                    for (var i of this()) {
+                        var generator = Sequences.toGenerator(i);
+                        if (generator().next().value === i) {
                             yield i;
+                        } else {
+                            yield* generator.flatten()();
                         }
                     }
-                };
+                }.bind(this);
             }
         },
         loop: {
             writable: true,
             value: function loop(times) {
                 times || (times = Infinity);
-                var self = this;
                 return function* () {
                     for (var i = 0; i < times; ++i) {
-                        yield* self();
+                        yield* this();
                     }
-                };
+                }.bind(this);
             }
         },
         concat: {
             writable: true,
             value: function concat() {
                 var args = Array.prototype.slice.apply(arguments).filter(Sequences.isGenerator);
-                var self = this;
                 return function* () {
-                    yield* self();
+                    yield* this();
                     for (var i = 0; i < args.length; ++i) {
                         yield* args[i]();
                     }
-                };
+                }.bind(this);
             }
         },
         reduce: {

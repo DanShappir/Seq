@@ -14,7 +14,7 @@
         return v % 2;
     }
 
-    var x = Sequences.toGenerator([1,2,3][Symbol.iterator]());
+    var x = Sequences.toGenerator([1,2,3]);
     for (var i of x()) {
         console.log(i);
     }
@@ -26,4 +26,8 @@
     show('---');
 
     Sequences.numbers().head(5).loop().head(12).forEach(show);
+
+    show('---');
+
+    Sequences.toGenerator([1,[2,[3,[4,5]]]]).flatten().forEach(show);
 }());

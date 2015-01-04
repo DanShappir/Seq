@@ -41,13 +41,12 @@ console.log(Sequences.isGenerator('world')); // false
 ### Sequences.toGenerator()
 This function accepts a single argument, and transforms that argument into an appropriate generator. The following transformations rules are applied, in order:
 
-1. If the argument is an object that has a method that returns an iterator, e.g. an array, obtains an iterator and uses it for the generator
-2. If the argument is a generator, just returns it
-3. If the argument is a function, uses that function to generate the values of the genetor by invoking it every time a new value is required. A second, optional argument specifies a seed value for the initial function invocation
-4. If the argument is a collection (has a numeric length property) creates a generator that yields the collection elements in order. A second, optional argument spcifies that index of the element to start on
-5. If the argument is itself an iterator, uses that iterator for the generator
-6. If the argument is a regular objects, iterates over the objects properties and yields the name / value pairs
-7. Otherwise creates a simple generator that yields the provided argument
+1. If the argument is an iterator, create a generator for it (yield*)
+2. If the argument is already a generator, just return it
+3. If the argument is an object that has a method that returns a generator, e.g. an array, obtain the generator and return it
+4. If the argument is a function, use that function to generate the values of the genetor by invoking it every time a new value is required. A second, optional argument specifies a seed value for the initial function invocation
+5. If the argument is a collection (has a numeric length property) create a generator that yields the collection elements in order. A second, optional argument spcifies that index of the element to start on
+6. Otherwise create a simple generator that yields the provided argument
  
 Using *Sequences.toGenerator* enables you to apply the iteration methods on any type of element, for example:
 ```javascript
