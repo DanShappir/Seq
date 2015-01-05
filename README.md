@@ -40,7 +40,6 @@ console.log(Sequences.isGenerator('world')); // false
 
 ### Sequences.toGenerator()
 This function accepts a single argument, and transforms that argument into an appropriate generator. The following transformations rules are applied, in order:
-
 1. If the argument is an iterator, create a generator for it (yield*)
 2. If the argument is already a generator, just return it
 3. If the argument is an object that has a method that returns a generator, e.g. an array, obtain the generator and return it
@@ -63,3 +62,13 @@ Helper function that returns a generator that emits a sequence of integers, by d
 ```javascript
 console.log(Sequences.numbers(2, 2).head(5).toArray()); // outputs [2, 4, 6, 8, 10]
 ```
+The generator returned by *Sequences.numbers* can also receive an initial value. If specified, this value overrides any initial value provided to *Sequences.numbers* itself.
+
+### Filters
+Several of the API methods accept a filter argument. Often this will be a regular function (not a generator), in which case a second argument can specify the *this* value for that function. In this scenario, the specified filter works much the same way as callbacks provided to array iteration methods.
+```javascript
+Sequences.numbers().head(10).filter(function (v) { return v % 2; }).
+```
+If a specified filter argument is not a function, or is a generator function, a filter function will be automatically synthesized from it, using the following process:
+1. Use *Sequences.toGenerator* to transform the the argument into a generator
+2. 
