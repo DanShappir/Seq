@@ -7,13 +7,13 @@ var Sequences;
     Object.defineProperties(Sequences, {
         numbers: {
             writable: true,
-            value: function numbers(initValue, step) {
-                return function* numbers(initialValue) {
-                    var n = initialValue || initValue || 0;
-                    step || (step = 1);
+            value: function numbers(initialValue, step) {
+                return function* numbers(initialValue_, step_) {
+                    var n = initialValue_ || initialValue || 0;
+                    var s = step_ || step || 1;
                     while (true) {
                         yield n;
-                        n += step;
+                        n += s;
                     }
                 };
             }
@@ -79,9 +79,12 @@ var Sequences;
     function filterFunction(value, thisArg) {
         return typeof value === 'function' && !Sequences.isGenerator(value) ?
             value.bind(thisArg) :
-            function (v) {
-                return this.filter(function(x) { return x === v; }).head(1).reduce(function () { return true; }, false);
-            }.bind(Sequences.toGenerator(value));
+            function (initialValue, v) {
+                return this
+                    .filter(function(x) { return x === v; })
+                    .head(1)
+                    .reduce(function () { return true; }, false, initialValue);
+            }.bind(Sequences.toGenerator(value), thisArg);
     }
 
     function not(func) {
@@ -103,11 +106,13 @@ var Sequences;
         }
     }());
 
+    var slice = Array.prototype.slice;
+
     Object.defineProperties(proto, {
         forEach: {
             writable: true,
-            value: function forEach(callback, thisArg, initialValue) {
-                var r, i = this(initialValue);
+            value: function forEach(callback, thisArg) {
+                var r, i = this.apply(null, slice.call(arguments, 2));
                 while (true) {
                     var x = i.next(r);
                     if (x.done) {
@@ -120,8 +125,9 @@ var Sequences;
         until: {
             writable: true,
             value: function until(callback, thisArg) {
-                return function* (filter, initialValue) {
-                    var r, i = this(initialValue);
+                var filter = filterFunction(callback, thisArg);
+                return function* () {
+                    var r, i = this.apply(null, arguments);
                     while (true) {
                         var x = i.next(r);
                         if (x.done || filter(x.value, r) === true) {
@@ -129,7 +135,7 @@ var Sequences;
                         }
                         r = yield x.value;
                     }
-                }.bind(this, filterFunction(callback, thisArg));
+                }.bind(this);
             }
         },
         asLongAs: {
@@ -142,8 +148,8 @@ var Sequences;
             writable: true,
             value: function head(length) {
                 length || (length = 1);
-                return function* (initialValue) {
-                    var r, i = this(initialValue);
+                return function* () {
+                    var r, i = this.apply(null, arguments);
                     for (var counter = 0; counter < length; ++counter) {
                         var x = i.next(r);
                         if (x.done) {
@@ -157,13 +163,14 @@ var Sequences;
         filter: {
             writable: true,
             value: function filter(callback, thisArg) {
-                return function* (filter, initialValue) {
-                    for (var i of this(initialValue)) {
+                var filter = filterFunction(callback, thisArg);
+                return function* () {
+                    for (var i of this.apply(null, arguments)) {
                         if (filter(i)) {
                             yield i;
                         }
                     }
-                }.bind(this, filterFunction(callback, thisArg));
+                }.bind(this);
             }
         },
         exclude: {
@@ -176,8 +183,8 @@ var Sequences;
             writable: true,
             value: function skip(callback, thisArg) {
                 return typeof callback === 'number' ?
-                    function* (number, initialValue) {
-                        var iter = this(initialValue);
+                    function* (number) {
+                        var iter = this.apply(null, slice.call(arguments, 2));
                         var counter = 0;
                         for (var i of iter) {
                             if (++counter > number) {
@@ -187,8 +194,8 @@ var Sequences;
                         }
                         yield* iter;
                     }.bind(this, callback) :
-                    function* (filter, initialValue) {
-                        var iter = this(initialValue);
+                    function* (filter) {
+                        var iter = this.apply(null, slice.call(arguments, 2));
                         for (var i of iter) {
                             if (!filter(i)) {
                                 yield i;
@@ -202,8 +209,8 @@ var Sequences;
         map: {
             writable: true,
             value: function map(callback, thisArg) {
-                return function* (initialValue) {
-                    var r, i = this(initialValue);
+                return function* () {
+                    var r, i = this.apply(null, arguments);
                     while (true) {
                         var x = i.next(r);
                         if (x.done) {
@@ -217,13 +224,13 @@ var Sequences;
         flatten: {
             writable: true,
             value: function flatten() {
-                return function* (initialValue) {
-                    for (var i of this(initialValue)) {
+                return function* () {
+                    for (var i of this.apply(null, arguments)) {
                         var generator = Sequences.toGenerator(i);
                         if (generator().next().value === i) {
                             yield i;
                         } else {
-                            yield* generator.flatten()();
+                            yield* generator.flatten().apply(null, arguments);
                         }
                     }
                 }.bind(this);
@@ -233,9 +240,9 @@ var Sequences;
             writable: true,
             value: function loop(times) {
                 times || (times = Infinity);
-                return function* (initialValue) {
+                return function* () {
                     for (var i = 0; i < times; ++i) {
-                        yield* this(initialValue);
+                        yield* this.apply(null, arguments);
                     }
                 }.bind(this);
             }
@@ -244,18 +251,18 @@ var Sequences;
             writable: true,
             value: function concat() {
                 var args = Sequences.toGenerator(arguments).map(Sequences.toGenerator);
-                return function* (initialValue) {
-                    yield* this(initialValue);
+                return function* () {
+                    yield* this.apply(null, arguments);
                     for (var i of args()) {
-                        yield* i();
+                        yield* i.apply(null, arguments);
                     }
                 }.bind(this);
             }
         },
         reduce: {
             writable: true,
-            value: function reduce(callback, r, initialValue) {
-                var i = this(initialValue);
+            value: function reduce(callback, r) {
+                var i = this.apply(null, slice.call(arguments, 2));
                 while (true) {
                     var x = i.next(r);
                     if (x.done) {
@@ -269,10 +276,11 @@ var Sequences;
         combine: {
             writable: true,
             value: function combine() {
-                var args = Sequences.toGenerator(arguments).map(Sequences.toGenerator);
-                return function* (initialValue) {
-                    var iters = args.map(function (g) { return g(); }).toArray();
-                    iters.unshift(this(initialValue))
+                var generators = Sequences.toGenerator(arguments).map(Sequences.toGenerator);
+                return function* () {
+                    var args = slice.call(arguments);
+                    var iters = generators.map(function (g) { return g.apply(null, args); }).toArray();
+                    iters.unshift(this.apply(null, args));
                     while (true) {
                         var nexts = iters.map(function (i) { return i.next(); });
                         if (nexts.some(function (r) { return r.done; })) {
@@ -296,20 +304,29 @@ var Sequences;
         },
         indexOf: {
             writable: true,
-            value: function indexOf(value, fromIndex, initialValue) {
+            value: function indexOf(value, fromIndex) {
                 return this.combine(Sequences.numbers())
                     .skip(fromIndex)
                     .filter(function (v) { return v[0] === value; })
                     .head()
-                    .reduce(function (r, v) { return v[1]; }, -1, initialValue);
+                    .init(slice.call(arguments, 2))
+                    .reduce(function (r, v) { return v[1]; }, -1);
+            }
+        },
+        init: {
+            writable: true,
+            value: function init(args) {
+                return function* () {
+                    yield* this.apply(null, args);
+                }.bind(this);
             }
         },
         toArray: {
             writable: true,
-            value: function toArray(initialValue) {
-                return this.reduce(function (a, v) {
-                    return a.push(v), a;
-                }, [], initialValue);
+            value: function toArray() {
+                return this
+                    .init(slice.call(arguments))
+                    .reduce(function (a, v) { return a.push(v), a; }, []);
             }
         }
     });
