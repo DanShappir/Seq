@@ -1,6 +1,6 @@
 # Sequences
 ## Iteration methods for ES6 (JavaScript) Generators / Iterators
-Having played with ES6 generators and iterators, it occured to me that their designers are not fans of functional programming. Otherwise how can you explain the total lack of iteration functions, and the complete reliance on various incarnations of the *for* loop. But JavaScript is a highly malleable Programming Language, so I decided to add them myself. The result is the Sequences library that allows you to write code such as:
+Having played with ES6 generators and iterators, it occured to me that their designers are not fans of functional programming. Otherwise how can you explain the total lack of iteration functions, and the significant reliance on various incarnations of the *for* loop. But JavaScript is a highly malleable Programming Language, so I decided to add them myself. The result is the Sequences library that allows you to write code such as:
 ```javascript
 function* numbers() {
   var n = 0;
@@ -71,4 +71,12 @@ Sequences.numbers().head(10).filter(function (v) { return v % 2; }).
 ```
 If a specified filter argument is not a function, or is a generator function, a filter function will be automatically synthesized from it, using the following process:
 1. Use *Sequences.toGenerator* to transform the the argument into a generator
-2. 
+2. Synthesize a function taking a single argument
+3. That function searches for the given argument value in the sequence generated from the generator created in step #1
+4. If value is found return *true*, otherwise return *false*
+5. Use the Synthesized function as the filter function (ignoring a *this* value, if specified)
+For example:
+```javascript
+g.until(['done', 'finished', 'end']).forEach(console.log.bind(console));
+```
+will display all the values provided by generator *g*, until *g* generates one of the strings 'done', 'finished', or 'end'.
