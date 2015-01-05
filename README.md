@@ -26,7 +26,7 @@ Simply use [Bower](http://bower.io/):
 3. Referrence the file: *bower_components/sequences/js/sequences.js*
 
 ## API
-The majority of the services provides by the Sequences library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods return a referrence to the generator instance they were invoked on, they can be chained together. In addition, several service functions are provided in the *Sequences* name space.
+The majority of the services provides by the Sequences library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods also return a generator instance, they can be chained together. In addition, several service functions are provided in the *Sequences* namespace.
 
 ### Sequences.isGenerator()
 This function accepts a single argument, and returns *true* if that argument is a generator, and *false* otherwise.
