@@ -83,3 +83,31 @@ For example:
 g.until(['done', 'finished', 'end']).forEach(console.log.bind(console));
 ```
 will display all the values provided by generator *g*, until *g* generates one of the strings 'done', 'finished', or 'end'.
+
+**Note:** be careful when using a generator or an iterator as a filter. Since the value is comparde to every item in the sequence until a match is found, the may cause an infinite loop if the sequence is not delimited.
+
+### Initialization
+Generators can receive arguments, just like a regular function, and use these arguments to calculate the generated sequence, for example:
+```javascript
+function* generator(init) {
+  var v = init || 0;
+  while (true) {
+    yield v++;
+  }
+}
+var iter1 = generator(1); // 1, 2. 3, ...
+var iter2 = generator(3); // 3, 4, 5, ...
+```
+The iteration methods allow passing initialization parameters as extra arguments, for example:
+```javascript
+generator.head(42).forEach(function (v) { console.log(v); }, null, 5); // 5, 6, 7, ...
+```
+*5* is the initialization parameter that is ultimately passed to *generator*. (The preceeding *null* is the *this* value for the filter function.)
+
+Since binding a generator returns a generator, the *bind* method can also be used to achieve the same effect:
+```javascript
+generator.head(42).bind(null, 5).forEach(function (v) { console.log(v); }); // 5, 6, 7, ...
+```
+
+## Iteration methods
+# forEach
