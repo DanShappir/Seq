@@ -15,7 +15,7 @@
 
     Sequences.numbers().combine(Sequences.numbers(1), [2,3,4,5]).forEach(show);
 
-    show('---');
+    show('1 ---');
 
     function isOdd(v) {
         return v % 2;
@@ -25,19 +25,29 @@
         g.filter(isOdd).forEach(show);
     }).exclude(isOdd).forEach(show);
 
-    show('---');
+    show('2 ---');
 
     Sequences.numbers().head(4).concat(Sequences.numbers().head(3), Sequences.numbers().head(2), 42).forEach(show);
 
-    show('---');
+    show('3 ---');
 
-    Sequences.numbers().head(5).loop().head(12).forEach(show);
+    Sequences.numbers().head(5).loop().head(12).forEach(show, null, 4);
 
-    show('---');
+    show('4 ---');
 
     Sequences.toGenerator([1,[2,[3,[4,5]]]]).flatten().forEach(show);
 
-    show('---');
+    show('5 ---');
 
     Sequences.numbers().until(Sequences.numbers(6).head(3)).forEach(show);
+
+    show('6 ---');
+
+    function* gen(v) {
+        v || (v = 0);
+        while (true) {
+            v += (yield v) || v;
+        }
+    }
+    gen.head(10).forEach(function (v) { return show(v), v; }, null, 1);
 }());
