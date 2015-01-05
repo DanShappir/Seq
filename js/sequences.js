@@ -305,27 +305,20 @@ var Sequences;
         indexOf: {
             writable: true,
             value: function indexOf(value, fromIndex) {
-                return this.combine(Sequences.numbers())
+                return this
+                    .bind.apply(this, slice.call(arguments, 2))
+                    .combine(Sequences.numbers())
                     .skip(fromIndex)
                     .filter(function (v) { return v[0] === value; })
                     .head()
-                    .init(slice.call(arguments, 2))
                     .reduce(function (r, v) { return v[1]; }, -1);
-            }
-        },
-        init: {
-            writable: true,
-            value: function init(args) {
-                return function* () {
-                    yield* this.apply(null, args);
-                }.bind(this);
             }
         },
         toArray: {
             writable: true,
             value: function toArray() {
                 return this
-                    .init(slice.call(arguments))
+                    .bind.apply(this, slice.call(arguments))
                     .reduce(function (a, v) { return a.push(v), a; }, []);
             }
         }
