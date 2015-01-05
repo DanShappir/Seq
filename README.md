@@ -1,6 +1,6 @@
 # Sequences
 ## Iteration methods for ES6 (JavaScript) Generators / Iterators
-Having played with ES6 generators and iterators, it occured to me that their designers are not fans of functional programming. Otherwise how can you explain the total lack of iteration functions, and the significant reliance on various incarnations of the *for* loop. But JavaScript is a highly malleable Programming Language, so I decided to add them myself. The result is the Sequences library that allows you to write code such as:
+Having played with ES6 generators and iterators, it occured to me that their designers are not big fans of functional programming. Otherwise how can you explain the total lack of iteration functions, and the significant reliance on various incarnations of the *for* loop. But JavaScript is a highly malleable Programming Language, so I decided to add them myself. The result is the Sequences library that allows you to write code such as:
 ```javascript
 function* numbers() {
   var n = 0;
