@@ -42,11 +42,11 @@ var Sequences;
                         return source;
                     }
                     if (typeof source === 'function') {
-                        return function* generatorFromFunction() {
-                            var r = initialValue;
+                        return function* generatorFromFunction(initialValue_) {
+                            var r = initialValue_ || initialValue;
                             while (true) {
                                 r = source(r);
-                                if (r && ('value' in r) && ('done' in r)) {
+                                if (r && typeof r === 'object' && ('value' in r) && ('done' in r)) {
                                     if (r.done) {
                                         break;
                                     }
@@ -320,6 +320,12 @@ var Sequences;
                 return this
                     .bind.apply(this, slice.call(arguments))
                     .reduce(function (a, v) { return a.push(v), a; }, []);
+            }
+        },
+        use: {
+            writable: true,
+            value: function use(callback, thisArg) {
+                return callback.call(thisArg, this.apply(null, slice.call(arguments, 2)));
             }
         }
     });
