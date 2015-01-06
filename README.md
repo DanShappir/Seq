@@ -8,7 +8,7 @@ function* numbers() {
     yield n++;
   }
 }
-numbers.map(function (v) { return 2 * v; }).head(10).forEach(function (v) { console.log(v); });
+numbers.map((v) => 2 * v).head(10).forEach((v) => console.log(v));
 ```
 To list the first ten even numbers. Or alternatively:
 ```javascript
@@ -17,6 +17,8 @@ Sequences.numbers.filter((v) => v % 2).head(10).forEach(console.log.bind(console
 assuming support for arrow functions. Now isn't that nice!
 
 As an interesting sideeffect, the Sequences library essentially eliminates the need for iterators, since all the iteration methods are applied directly on the generators.
+
+**Note:** throughout this document I will use the arrow notation for defining functions, even though Chrome currently does not support it (even though it does support generators and iterators).
 
 ## Installation
 Simply use [Bower](http://bower.io/):
@@ -52,8 +54,8 @@ Using *Sequences.toGenerator* enables you to apply the iteration methods on any 
 ```javascript
 function sumNumbers() {
   return Sequences.toGenerator(arguments)
-    .filter(function (arg) { return typeof arg === 'number'; })
-    .reduce(function (sum, arg) { return sum + arg; }, 0);
+    .filter((arg) => typeof arg === 'number')
+    .reduce((sum, arg) => sum + arg, 0);
 }
 console.log(sumNumbers(1, 2, 'hello', 3)); // outputs 6
 ```
@@ -68,7 +70,7 @@ The generator returned by *Sequences.numbers* can also receive an initial value 
 ### Filters
 Several of the API methods accept a filter argument. Often this will be a regular function (not a generator), in which case a second argument can specify the *this* value for that function. In this scenario, the specified filter works much the same way as callbacks provided to array iteration methods.
 ```javascript
-Sequences.numbers().head(10).filter(function (v) { return v % 2; }).
+Sequences.numbers().head(10).filter((v) => v % 2).forEach((v) => console.log(v));
 ```
 If a specified filter argument is not a function, or is a generator function, a filter function will be automatically synthesized from it, using the following process:
 
@@ -100,14 +102,14 @@ var iter2 = generator(3); // 3, 4, 5, ...
 ```
 The iteration methods allow passing initialization parameters as extra arguments, for example:
 ```javascript
-generator.head(42).forEach(function (v) { console.log(v); }, null, 5); // 5, 6, 7, ...
+generator.head(42).forEach((v) => console.log(v), null, 5); // 5, 6, 7, ...
 ```
 *5* is the initialization parameter that is ultimately passed to *generator*. (The preceeding *null* is the *this* value for the filter function.)
 
 Since binding a generator returns a generator, the *bind* method can also be used to achieve the same effect:
 ```javascript
-generator.head(42).bind(null, 5).forEach(function (v) { console.log(v); }); // 5, 6, 7, ...
+generator.head(42).bind(null, 5).forEach((v) => console.log(v)); // 5, 6, 7, ...
 ```
 
 ## Iteration methods
-# forEach
+### forEach
