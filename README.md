@@ -30,7 +30,7 @@ Simply use [Bower](http://bower.io/):
 ## API
 The majority of the services provides by the Sequences library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods also return a generator instance, they can be chained together. In addition, several service functions are provided in the *Sequences* namespace.
 
-### Sequences.isGenerator()
+### Sequences.isGenerator(candidate)
 This function accepts a single argument, and returns *true* if that argument is a generator, and *false* otherwise.
 ```javascript
 function* generator() {
@@ -40,14 +40,14 @@ console.log(Sequences.isGenerator(generator)); // true
 console.log(Sequences.isGenerator('world')); // false
 ```
 
-### Sequences.toGenerator()
-This function accepts a single argument, and transforms that argument into an appropriate generator. The following transformations rules are applied, in order:
+### Sequences.toGenerator(source[, initialValue])
+This function accepts a single argument *source*, and transforms it into an appropriate generator. The following transformations rules are applied, in order:
 
 1. If the argument is an iterator, create a generator for it (yield*)
 2. If the argument is already a generator, just return it
 3. If the argument is an object that has a method that returns a generator, e.g. an array, obtain the generator and return it
-4. If the argument is a function, use that function to generate the values of the genetor by invoking it every time a new value is required. A second, optional argument specifies a seed value for the initial function invocation
-5. If the argument is a collection (has a numeric length property) create a generator that yields the collection elements in order. A second, optional argument spcifies that index of the element to start on
+4. If the argument is a function, use that function to generate the values of the genetor by invoking it every time a new value is required. A second, optional *initialValue* argument specifies a seed value for the first function invocation
+5. If the argument is a collection (has a numeric length property) create a generator that yields the collection elements in order. A second, optional *initialValue* argument specifies the index of the element to start on
 6. Otherwise create a simple generator that yields the provided argument
  
 Using *Sequences.toGenerator* enables you to apply the iteration methods on any type of element, for example:
@@ -60,8 +60,8 @@ function sumNumbers() {
 console.log(sumNumbers(1, 2, 'hello', 3)); // outputs 6
 ```
 
-### Sequences.numbers()
-Helper function that returns a generator that emits a sequence of numbers, by default 0, 1, 2, ... You can optionaly specify a start value as a first argument. By default the start value is 0. You can also specify a step size. By default the step size is 1.
+### Sequences.numbers([initialValue[, step])
+Helper function that returns a generator that emits a sequence of numbers, by default 0, 1, 2, ... You can optionaly specify a start value as the *initialValue* first argument. By default the start value is 0. You can also specify a step size. By default the step size is 1.
 ```javascript
 console.log(Sequences.numbers(2, 2).head(5).toArray()); // outputs [2, 4, 6, 8, 10]
 ```
@@ -112,4 +112,12 @@ generator.head(42).bind(null, 5).forEach((v) => console.log(v)); // 5, 6, 7, ...
 ```
 
 ## Iteration methods
-### forEach
+### forEach(callback[, thisArgs[, generatorInitialization...]])
+Invoke the specified callback function for every item in the genered sequence. The callback receives the current item as an argument. If the callback returns a value, that value is provided back to the generator as the result of the *yield* instruction. An optional *thisArg* specifies the context of the callback function. Any additional optional arguments will be provided as arguments to the generator.
+```javascript
+Sequences.numbers().head(5).forEach((v) => console.log(v), null, 2); // 2, 3, 4, 5, 6
+```
+**Note:* since *forEach* cannot stop the iteration, do not use it with undelimited generators. Instead use methods such as *head* and *until* to limit the sequence.
+
+### until(callback[, thisArg])
+Creates a generator that emits all the provided values until the filter specified as *callback* returns *true* (see [filter]() section for details).
