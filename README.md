@@ -120,4 +120,24 @@ Sequences.numbers().head(5).forEach((v) => console.log(v), null, 2); // 2, 3, 4,
 **Note:* since *forEach* cannot stop the iteration, do not use it with undelimited generators. Instead use methods such as *head* and *until* to limit the sequence.
 
 ### until(callback[, thisArg])
-Creates a generator that emits all the provided values until the filter specified as *callback* returns *true* (see [filter]() section for details).
+Creates a generator that emits all the provided values until the filter specified as *callback* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
+```javascript
+Sequences.numbers().until((v) => v > 3).forEach((v) => console.log(v)); // 0, 1, 2, 3
+```
+
+### asLongAs(callback[, thisArg[, generatorInitialization...]])
+Creates a generator that emits all the provided values as-long-as the filter specified as *callback* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
+
+### head([length])
+Creates a generator that emits the first *length* provided items. If *length* is omitted then *1* is used. If you pass arguments to the created generator, they will be passed on as-is to the original generator.
+
+### filter(callback[, thisArg])
+Creates a generator that emits all the provided items for which the filter specified as *callback* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
+```javascript
+Sequences.numbers().filter((v) => v % 2 === 0).head(5).forEach((v) => console.log(v)); // 0, 2, 4, 6, 8
+```
+
+### exclude(callback[, thisArg])
+Creates a generator that emits all the provided items for which the filter specified as *callback* does **not** return *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
+
+### skip(callback[, thisArg])
