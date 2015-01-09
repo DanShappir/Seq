@@ -141,3 +141,15 @@ Sequences.numbers().filter((v) => v % 2 === 0).head(5).forEach((v) => console.lo
 Creates a generator that emits all the provided items for which the filter specified as *callback* does **not** return *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
 
 ### skip(callback[, thisArg])
+Creates a generator that emits all the provided items after the specified items are skipped. If the value provided as *callback* is a number then that number of items are skipped. Otherwise that value is used as a filter (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
+```javascript
+Sequences.numbers().skip(3).head(5).forEach((v) => console.log(v)); // 3, 4, 5, 6, 7
+```
+
+### map(callback[, thisArg])
+Creates a generator that emits all the provided items as transformed by applying the *callback* function to them. The callback receives the current item as an argument. An optional *thisArg* specifies the context of the callback function. In addition to the current item, the callback receives as a second argument the value provided by the requesting iterator.
+```javascript
+Sequences.numbers().map((v) => -v).head(5).forEach((v) => console.log(v)); // 0, -1, -2, -3, -4
+```
+
+### 
