@@ -112,44 +112,45 @@ generator.head(42).bind(null, 5).forEach((v) => console.log(v)); // 5, 6, 7, ...
 ```
 
 ## Iteration methods
-### forEach(callback[, thisArgs[, generatorInitialization...]])
-Invoke the specified callback function for every item in the genered sequence. The callback receives the current item as an argument. If the callback returns a value, that value is provided back to the generator as the result of the *yield* instruction. An optional *thisArg* specifies the context of the callback function. Any additional optional arguments will be provided as arguments to the generator.
+### forEach(callback[, generatorInitialization...])
+Invoke the specified callback function for every item in the genered sequence. The callback receives the current item as an argument. If the callback returns a value, that value is provided back to the generator as the result of the *yield* instruction. Any additional optional arguments will be provided as arguments to the generator.
 ```javascript
 Sequences.numbers().head(5).forEach((v) => console.log(v), null, 2); // 2, 3, 4, 5, 6
 ```
 **Note:* since *forEach* cannot stop the iteration, do not use it with undelimited generators. Instead use methods such as *head* and *until* to limit the sequence.
 
-### until(callback[, thisArg])
-Creates a generator that emits all the provided values until the filter specified as *callback* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
+### until(filter[, generatorInitialization...])
+Creates a generator that emits all the provided values until the specified *filter* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
 ```javascript
 Sequences.numbers().until((v) => v > 3).forEach((v) => console.log(v)); // 0, 1, 2, 3
 ```
 
-### asLongAs(callback[, thisArg[, generatorInitialization...]])
-Creates a generator that emits all the provided values as-long-as the filter specified as *callback* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
+### asLongAs(filter[, generatorInitialization...])
+Creates a generator that emits all the provided values as-long-as the specified *filter* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
 
 ### head([length])
 Creates a generator that emits the first *length* provided items. If *length* is omitted then *1* is used. If you pass arguments to the created generator, they will be passed on as-is to the original generator.
 
-### filter(callback[, thisArg])
-Creates a generator that emits all the provided items for which the filter specified as *callback* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
+### filter(filter)
+Creates a generator that emits all the provided items for which the specified *filter* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
 ```javascript
 Sequences.numbers().filter((v) => v % 2 === 0).head(5).forEach((v) => console.log(v)); // 0, 2, 4, 6, 8
 ```
 
-### exclude(callback[, thisArg])
-Creates a generator that emits all the provided items for which the filter specified as *callback* does **not** return *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
+### exclude(filter)
+Creates a generator that emits all the provided items for which the specified *filter* does **not** return *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
 
-### skip(callback[, thisArg])
-Creates a generator that emits all the provided items after the specified items are skipped. If the value provided as *callback* is a number then that number of items are skipped. Otherwise that value is used as a filter (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
+### skip(filter)
+Creates a generator that emits all the provided items after the specified items are skipped. If the value provided as *filter* is a number then that number of items are skipped. Otherwise that value is used as a filter (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
 ```javascript
 Sequences.numbers().skip(3).head(5).forEach((v) => console.log(v)); // 3, 4, 5, 6, 7
 ```
 
-### map(callback[, thisArg])
-Creates a generator that emits all the provided items as transformed by applying the *callback* function to them. The callback receives the current item as an argument. An optional *thisArg* specifies the context of the callback function. In addition to the current item, the callback receives as a second argument the value provided by the requesting iterator.
+### map(callback)
+Creates a generator that emits all the provided items as transformed by applying the *callback* function to them. The callback receives the current item as an argument. In addition to the current item, the callback receives as a second argument the value provided by the requesting iterator.
 ```javascript
 Sequences.numbers().map((v) => -v).head(5).forEach((v) => console.log(v)); // 0, -1, -2, -3, -4
 ```
 
-### 
+### inverseMap(map)
+Creates a generator that emits all the provided items as-is, but transforms values returned to the generator by applying the *callback* function to them. The callback receives the value to be returned to the generator as an argument. In addition, the callback receives as a second argument the original value provided by the source generator.
