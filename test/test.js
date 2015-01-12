@@ -31,7 +31,7 @@
 
     show('3 ---');
 
-    Sequences.numbers().head(5).loop().head(12).forEach(show, null, 4);
+    Sequences.numbers().head(5).loop().head(12).forEach(show, 4);
 
     show('4 ---');
 
@@ -49,5 +49,5 @@
             v += (yield v) || v;
         }
     }
-    gen.head(10).forEach(function (v) { return show(v), v; }, null, 1);
+    gen.head(10).forEach(function (v) { return show(v), v; }, 1);
 }());

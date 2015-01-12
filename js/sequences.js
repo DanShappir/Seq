@@ -42,21 +42,7 @@ var Sequences;
                         return source;
                     }
                     if (typeof source === 'function') {
-                        return function* generatorFromFunction(initialValue_) {
-                            var r = initialValue_ || initialValue;
-                            while (true) {
-                                r = source(r);
-                                if (r && typeof r === 'object' && ('value' in r) && ('done' in r)) {
-                                    if (r.done) {
-                                        break;
-                                    }
-                                    r.result = yield r.value;
-                                } else {
-                                    var t = yield r;
-                                    r = typeof t !== 'undefined' ? t : r;
-                                }
-                            }
-                        };
+                        return Object.setPrototypeOf(source, proto);
                     }
                     if (typeof source.length === 'number') {
                         return function* generatorFromCollection() {
@@ -76,15 +62,15 @@ var Sequences;
 
     var proto = Object.getPrototypeOf(Sequences.numbers());
 
-    function filterFunction(value, thisArg) {
+    function filterFunction(value) {
         return typeof value === 'function' && !Sequences.isGenerator(value) ?
-            value.bind(thisArg) :
-            function (initialValue, v) {
+            value :
+            function (v) {
                 return this
                     .filter(function(x) { return x === v; })
                     .head(1)
-                    .reduce(function () { return true; }, false, initialValue);
-            }.bind(Sequences.toGenerator(value), thisArg);
+                    .reduce(function () { return true; }, false);
+            }.bind(Sequences.toGenerator(value));
     }
 
     function not(func) {
@@ -111,26 +97,26 @@ var Sequences;
     Object.defineProperties(proto, {
         forEach: {
             writable: true,
-            value: function forEach(callback, thisArg) {
-                var r, i = this.apply(null, slice.call(arguments, 2));
+            value: function forEach(callback) {
+                var r, i = this.apply(null, slice.call(arguments, 1));
                 while (true) {
                     var x = i.next(r);
                     if (x.done) {
                         break;
                     }
-                    r = callback.call(thisArg, x.value);
+                    r = callback(x.value);
                 }
             }
         },
         until: {
             writable: true,
-            value: function until(callback, thisArg) {
-                var filter = filterFunction(callback, thisArg);
+            value: function until(filter) {
+                var callback = filterFunction(filter);
                 return function* () {
                     var r, i = this.apply(null, arguments);
                     while (true) {
                         var x = i.next(r);
-                        if (x.done || filter(x.value, r) === true) {
+                        if (x.done || callback(x.value, r) === true) {
                             break;
                         }
                         r = yield x.value;
@@ -140,8 +126,8 @@ var Sequences;
         },
         asLongAs: {
             writable: true,
-            value: function asLongAs(callback, thisArg) {
-                return this.until(not(filterFunction(callback, thisArg)));
+            value: function asLongAs(filter) {
+                return this.until(not(filterFunction(filter)));
             }
         },
         head: {
@@ -162,8 +148,8 @@ var Sequences;
         },
         filter: {
             writable: true,
-            value: function filter(callback, thisArg) {
-                var filter = filterFunction(callback, thisArg);
+            value: function filter(filter) {
+                var filter = filterFunction(filter);
                 return function* () {
                     for (var i of this.apply(null, arguments)) {
                         if (filter(i)) {
@@ -175,16 +161,16 @@ var Sequences;
         },
         exclude: {
             writable: true,
-            value: function exclude(callback, thisArg) {
-                return this.filter(not(filterFunction(callback, thisArg)));
+            value: function exclude(filter) {
+                return this.filter(not(filterFunction(filter)));
             }
         },
         skip: {
             writable: true,
-            value: function skip(callback, thisArg) {
-                return typeof callback === 'number' ?
+            value: function skip(filter) {
+                return typeof filter === 'number' ?
                     function* (number) {
-                        var iter = this.apply(null, slice.call(arguments, 2));
+                        var iter = this.apply(null, slice.call(arguments, 1));
                         var counter = 0;
                         for (var i of iter) {
                             if (++counter > number) {
@@ -193,22 +179,22 @@ var Sequences;
                             }
                         }
                         yield* iter;
-                    }.bind(this, callback) :
-                    function* (filter) {
-                        var iter = this.apply(null, slice.call(arguments, 2));
+                    }.bind(this, filter) :
+                    function* (callback) {
+                        var iter = this.apply(null, slice.call(arguments, 1));
                         for (var i of iter) {
-                            if (!filter(i)) {
+                            if (!callback(i)) {
                                 yield i;
                                 break;
                             }
                         }
                         yield* iter;
-                    }.bind(this, filterFunction(callback, thisArg));
+                    }.bind(this, filterFunction(filter));
             }
         },
         map: {
             writable: true,
-            value: function map(callback, thisArg) {
+            value: function map(callback) {
                 return function* () {
                     var r, i = this.apply(null, arguments);
                     while (true) {
@@ -216,7 +202,22 @@ var Sequences;
                         if (x.done) {
                             break;
                         }
-                        r = yield callback.call(thisArg, x.value, r);
+                        r = yield callback(x.value, r);
+                    }
+                }.bind(this);
+            }
+        },
+        inverseMap: {
+            writable: true,
+            value: function map(callback) {
+                return function* () {
+                    var r, i = this.apply(null, arguments);
+                    while (true) {
+                        var x = i.next(r);
+                        if (x.done) {
+                            break;
+                        }
+                        r = callback(yield x.value, x.value);
                     }
                 }.bind(this);
             }
@@ -324,8 +325,8 @@ var Sequences;
         },
         use: {
             writable: true,
-            value: function use(callback, thisArg) {
-                return callback.call(thisArg, this.apply(null, slice.call(arguments, 2)));
+            value: function use(callback) {
+                return callback(this.apply(null, slice.call(arguments, 1)));
             }
         }
     });
