@@ -57,21 +57,23 @@ var Sequences;
                     yield source;
                 };
             }
+        },
+        toFilter: {
+            writable: true,
+            value: function toFilter(value) {
+                return typeof value === 'function' && !Sequences.isGenerator(value) ?
+                    value :
+                    function (v) {
+                        return this
+                            .filter(function(x) { return x === v; })
+                            .head(1)
+                            .reduce(function () { return true; }, false);
+                    }.bind(Sequences.toGenerator(value));
+            }
         }
     });
 
     var proto = Object.getPrototypeOf(Sequences.numbers());
-
-    function filterFunction(value) {
-        return typeof value === 'function' && !Sequences.isGenerator(value) ?
-            value :
-            function (v) {
-                return this
-                    .filter(function(x) { return x === v; })
-                    .head(1)
-                    .reduce(function () { return true; }, false);
-            }.bind(Sequences.toGenerator(value));
-    }
 
     function not(func) {
         return function () {
@@ -111,7 +113,7 @@ var Sequences;
         until: {
             writable: true,
             value: function until(filter) {
-                var callback = filterFunction(filter);
+                var callback = Sequences.toFilter(filter);
                 return function* () {
                     var r, i = this.apply(null, arguments);
                     while (true) {
@@ -127,7 +129,7 @@ var Sequences;
         asLongAs: {
             writable: true,
             value: function asLongAs(filter) {
-                return this.until(not(filterFunction(filter)));
+                return this.until(not(Sequences.toFilter(filter)));
             }
         },
         head: {
@@ -149,10 +151,10 @@ var Sequences;
         filter: {
             writable: true,
             value: function filter(filter) {
-                var filter = filterFunction(filter);
+                var callback = Sequences.toFilter(filter);
                 return function* () {
                     for (var i of this.apply(null, arguments)) {
-                        if (filter(i)) {
+                        if (callback(i)) {
                             yield i;
                         }
                     }
@@ -162,7 +164,7 @@ var Sequences;
         exclude: {
             writable: true,
             value: function exclude(filter) {
-                return this.filter(not(filterFunction(filter)));
+                return this.filter(not(Sequences.toFilter(filter)));
             }
         },
         skip: {
@@ -189,7 +191,7 @@ var Sequences;
                             }
                         }
                         yield* iter;
-                    }.bind(this, filterFunction(filter));
+                    }.bind(this, Sequences.toFilter(filter));
             }
         },
         map: {
