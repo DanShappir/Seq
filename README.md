@@ -44,13 +44,13 @@ console.log(Sequences.isGenerator('world')); // false
 This function accepts a single argument *source*, and transforms it into an appropriate generator. The following transformations rules are applied, in order:
 
 1. If the argument is an iterator, create a generator for it (yield*)
-2. If the argument is already a generator, just return it
-3. If the argument is an object that has a method that returns a generator, e.g. an array, obtain the generator and return it
-4. If the argument is a function, use that function to generate the values of the genetor by invoking it every time a new value is required. A second, optional *initialValue* argument specifies a seed value for the first function invocation
-5. If the argument is a collection (has a numeric length property) create a generator that yields the collection elements in order. A second, optional *initialValue* argument specifies the index of the element to start on
+2. If the argument is a collection that has an iterator, create a generator for the iterator (yield*)
+3. If the argument is already a generator, just return it
+4. If the argument is a function, treat that function as a generator
+5. If the argument is a collection that doesn't have an iterator, create a generator that loops over the elements
 6. Otherwise create a simple generator that yields the provided argument
  
-Using *Sequences.toGenerator* enables you to apply the iteration methods on any type of element, for example:
+Using *Sequences.toGenerator* enables you to apply the iteration methods on most any type of element, for example:
 ```javascript
 function sumNumbers() {
   return Sequences.toGenerator(arguments)
@@ -67,18 +67,16 @@ console.log(Sequences.numbers(2, 2).head(5).toArray()); // outputs [2, 4, 6, 8, 
 ```
 The generator returned by *Sequences.numbers* can also receive an initial value and a step value. If specified, these values override any initial values provided to *Sequences.numbers* itself.
 
-### Filters
-Several of the API methods accept a filter argument. Often this will be a regular function (not a generator), in which case a second argument can specify the *this* value for that function. In this scenario, the specified filter works much the same way as callbacks provided to array iteration methods.
+### Sequences.toFilter(value)
+Several of the API methods accept a filter argument. Often this will be a regular function (not a generator), in which case  the specified filter works much the same way as callbacks provided to array iteration methods.
 ```javascript
 Sequences.numbers().head(10).filter((v) => v % 2).forEach((v) => console.log(v));
 ```
-If a specified filter argument is not a function, or is a generator function, a filter function will be automatically synthesized from it, using the following process:
+In addition, filters that are not functions are also supporting, using the *Sequences.toFilter* helper function. This function is used to synthesize filters from additional types, using the following process:
 
-1. Use *Sequences.toGenerator* to transform the the argument into a generator
-2. Synthesize a function taking a single argument
-3. That function searches for the given argument value in the sequence generated from the generator created in step #1
-4. If value is found return *true*, otherwise return *false*
-5. Use the Synthesized function as the filter function (ignoring a *this* value, if specified)
+1. If the argument is a regular function (not a generator) then use it as described above
+2. Otherwise use *Sequences.toGenerator* to create a generator from the argument
+3. The create a filter function using that tries to match its argument to all the generated values
 
 For example:
 ```javascript
