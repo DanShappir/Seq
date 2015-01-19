@@ -152,3 +152,12 @@ Sequences.numbers().map((v) => -v).head(5).forEach((v) => console.log(v)); // 0,
 
 ### inverseMap(map)
 Creates a generator that emits all the provided items as-is, but transforms values returned to the generator by applying the *callback* function to them. The callback receives the value to be returned to the generator as an argument. In addition, the callback receives as a second argument the original value provided by the source generator.
+
+### flatten()
+Converts a generator that also emits sequences (collections, generators and iteratos), into a generator of simple values.
+```javascript
+Sequences.toGenerator([1,[2,[3,[4,5]]]]).flatten().forEach((v) => console.log(v)); // 1, 2, 3, 4, 5
+```
+
+### loop([times])
+Given a generator that emits a finite seqeunce, creates a generator that loops over the sequnce specified number of *times*. If *times* isn't secified, the created generator will loop forever.
