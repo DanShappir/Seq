@@ -35,7 +35,7 @@
 
     show('4 ---');
 
-    Sequences.toGenerator([1,[2,[3,[4,5]]]]).flatten().forEach(show);
+    Sequences.toGenerator([1,[2,[3,[4,5]]]]).flatten(-1).forEach(show);
 
     show('5 ---');
 

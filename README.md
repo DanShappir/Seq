@@ -153,11 +153,30 @@ Sequences.numbers().map((v) => -v).head(5).forEach((v) => console.log(v)); // 0,
 ### inverseMap(map)
 Creates a generator that emits all the provided items as-is, but transforms values returned to the generator by applying the *callback* function to them. The callback receives the value to be returned to the generator as an argument. In addition, the callback receives as a second argument the original value provided by the source generator.
 
-### flatten()
-Converts a generator that also emits sequences (collections, generators and iterators), into a generator of simple values.
+### flatten([depth])
+Converts a generator that also emits sequences (collections, generators and iterators), into a generator of simple values. The optional numeric depth argument specifies the level of flattening recursion. If not specified then a value of 0 is used, which means no recursion. For unlimited recursion specify a negative value.
 ```javascript
-Sequences.toGenerator([1,[2,[3,[4,5]]]]).flatten().forEach((v) => console.log(v)); // 1, 2, 3, 4, 5
+Sequences.toGenerator([1,[2,[3,[4,5]]]]).flatten(-1).forEach((v) => console.log(v)); // 1, 2, 3, 4, 5
 ```
 
 ### loop([times])
 Given a generator that emits a finite sequence, creates a generator that loops over the sequence specified number of *times*. If *times* isn't specified, the created generator will loop forever.
+```javascript
+Sequences.toGenerator([1,2,3]).loop().head(10).forEach((v) => console.log(v)); // 1, 2, 3, 1, 2, 3, 1, 2, 3, 1
+```
+
+### concat([s1 [, s2 [,s3 ...]]])
+Creates a generator that is the concatenation of the provided items and all the sequences provided as arguments.
+```javascript
+Sequences.toGenerator([1,2,3]).concat(Sequences.toGenerator([7,8,9])).forEach((v) => console.log(v)); // 1, 2, 3, 7, 8, 9
+```
+
+### reduce(callback [, seed])
+Similar to *Array.reduce* converts a sequence into a value by applying the callback function to previous result and the current element. The optional seed value specifies the result value to pass to the first callback invocation. If not specified *undefined* is used.
+```javascript
+Sequences.numbers().head(4).reduce((r, v) => r + v) // 6
+```
+**Note:** since *reduce* cannot stop the iteration, do not use it with undelimited generators with it. Instead use methods such as *head* and *until* to limit the sequence.
+
+### combine([s1 [, s2 [,s3 ...]]])
+Creates a generator whose elements are arrays of the provided items and the items of all the sequences provided as arguments. Stops as soon as any of the input sequences is done.
