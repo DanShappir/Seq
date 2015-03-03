@@ -1,6 +1,6 @@
 # Sequences
 ## Iteration methods for ES6 (JavaScript) Generators / Iterators
-Having played with ES6 generators and iterators, it occured to me that their designers are not big fans of functional programming. Otherwise how can you explain the total lack of iteration functions, and the significant reliance on various incarnations of the *for* loop. But JavaScript is a highly malleable Programming Language, so I decided to add them myself. The result is the Sequences library that allows you to write code such as:
+After trying out ES6 generators and iterators, it occurred to me that their designers are not big fans of functional programming. Otherwise how can you explain the total lack of iteration functions, and the significant reliance on various incarnations of the *for* loop. But JavaScript is a highly malleable Programming Language, so I decided to add them myself. The result is the **Sequences** library that allows you to write code such as:
 ```javascript
 function* numbers() {
   var n = 0;
@@ -12,13 +12,13 @@ numbers.map((v) => 2 * v).head(10).forEach((v) => console.log(v));
 ```
 To list the first ten even numbers. Or alternatively:
 ```javascript
-Sequences.numbers.filter((v) => v % 2).head(10).forEach(console.log.bind(console));
+numbers.filter((v) => v % 2).head(10).forEach(console.log.bind(console));
 ```
 assuming support for arrow functions. Now isn't that nice!
 
-As an interesting sideeffect, the Sequences library essentially eliminates the need for iterators, since all the iteration methods are applied directly on the generators.
+As an interesting side-effect, the **Sequences** library essentially eliminates the need for iterators, since all the iteration methods are applied directly on the generators.
 
-**Note:** throughout this document I will use the arrow notation for defining functions, even though Chrome currently does not support it (even though it does support generators and iterators).
+**Note:** throughout this document I will use the arrow notation for defining functions, even though Chrome currently does not support it (though it does support generators and iterators).
 
 ## Installation
 Simply use [Bower](http://bower.io/):
@@ -28,7 +28,7 @@ Simply use [Bower](http://bower.io/):
 3. Referrence the file: *bower_components/sequences/js/sequences.js*
 
 ## API
-The majority of the services provides by the Sequences library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods also return a generator instance, they can be chained together. In addition, several service functions are provided in the *Sequences* namespace.
+The majority of the services provides by the **Sequences** library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods also return a generator instance, they can be chained together. In addition, several service functions are provided in the *Sequences* namespace.
 
 ### Sequences.isGenerator(candidate)
 This function accepts a single argument, and returns *true* if that argument is a generator, and *false* otherwise.
@@ -43,8 +43,8 @@ console.log(Sequences.isGenerator('world')); // false
 ### Sequences.toGenerator(source[, initialValue])
 This function accepts a single argument *source*, and transforms it into an appropriate generator. The following transformations rules are applied, in order:
 
-1. If the argument is an iterator, create a generator for it (yield*)
-2. If the argument is a collection that has an iterator, create a generator for the iterator (yield*)
+1. If the argument is an iterator, create a generator for it (yield\*)
+2. If the argument is a collection that has an iterator, create a generator for the iterator (yield\*)
 3. If the argument is already a generator, just return it
 4. If the argument is a function, treat that function as a generator
 5. If the argument is a collection that doesn't have an iterator, create a generator that loops over the elements
@@ -61,14 +61,14 @@ console.log(sumNumbers(1, 2, 'hello', 3)); // outputs 6
 ```
 
 ### Sequences.numbers([initialValue[, step])
-Helper function that returns a generator that emits a sequence of numbers, by default 0, 1, 2, ... You can optionaly specify a start value as the *initialValue* first argument. By default the start value is 0. You can also specify a step size. By default the step size is 1.
+Helper function that returns a generator that emits a sequence of numbers, by default 0, 1, 2, ... You can optionally specify a start value as the *initialValue* first argument. By default the start value is 0. You can also specify a step size. By default the step size is 1.
 ```javascript
 console.log(Sequences.numbers(2, 2).head(5).toArray()); // outputs [2, 4, 6, 8, 10]
 ```
 The generator returned by *Sequences.numbers* can also receive an initial value and a step value. If specified, these values override any initial values provided to *Sequences.numbers* itself.
 
 ### Sequences.toFilter(value)
-Several of the API methods accept a filter argument. Often this will be a regular function (not a generator), in which case  the specified filter works much the same way as callbacks provided to array iteration methods.
+Several of the API methods accept a filter argument. Often this will be a regular function (not a generator), in which case the specified filter works much the same way as callbacks provided to array iteration methods.
 ```javascript
 Sequences.numbers().head(10).filter((v) => v % 2).forEach((v) => console.log(v));
 ```
@@ -76,7 +76,7 @@ In addition, filters that are not functions are also supporting, using the *Sequ
 
 1. If the argument is a regular function (not a generator) then use it as described above
 2. Otherwise use *Sequences.toGenerator* to create a generator from the argument
-3. The create a filter function using that tries to match its argument to all the generated values
+3. Create a filter function using that generator that tries to match its argument to all the generated values
 
 For example:
 ```javascript
@@ -84,7 +84,7 @@ g.until(['done', 'finished', 'end']).forEach(console.log.bind(console));
 ```
 will display all the values provided by generator *g*, until *g* generates one of the strings 'done', 'finished', or 'end'.
 
-**Note:** be careful when using a generator or an iterator as a filter. Since the value is comparde to every item in the sequence until a match is found, the may cause an infinite loop if the sequence is not delimited.
+**Note:** be careful when using a generator or an iterator as a filter. Since the value is compared to every item in the sequence until a match is found, the may cause an infinite loop if the sequence is not delimited.
 
 ### Initialization
 Generators can receive arguments, just like a regular function, and use these arguments to calculate the generated sequence, for example:
@@ -102,7 +102,7 @@ The iteration methods allow passing initialization parameters as extra arguments
 ```javascript
 generator.head(42).forEach((v) => console.log(v), null, 5); // 5, 6, 7, ...
 ```
-*5* is the initialization parameter that is ultimately passed to *generator*. (The preceeding *null* is the *this* value for the filter function.)
+*5* is the initialization parameter that is ultimately passed to *generator*. (The preceding *null* is the *this* value for the filter function.)
 
 Since binding a generator returns a generator, the *bind* method can also be used to achieve the same effect:
 ```javascript
@@ -111,11 +111,11 @@ generator.head(42).bind(null, 5).forEach((v) => console.log(v)); // 5, 6, 7, ...
 
 ## Iteration methods
 ### forEach(callback[, generatorInitialization...])
-Invoke the specified callback function for every item in the genered sequence. The callback receives the current item as an argument. If the callback returns a value, that value is provided back to the generator as the result of the *yield* instruction. Any additional optional arguments will be provided as arguments to the generator.
+Invoke the specified callback function for every item in the sequence. The callback receives the current item as an argument. If the callback returns a value, that value is provided back to the generator as the result of the *yield* instruction. Any additional optional arguments will be provided as arguments to the generator.
 ```javascript
 Sequences.numbers().head(5).forEach((v) => console.log(v), null, 2); // 2, 3, 4, 5, 6
 ```
-**Note:* since *forEach* cannot stop the iteration, do not use it with undelimited generators. Instead use methods such as *head* and *until* to limit the sequence.
+**Note:** since *forEach* cannot stop the iteration, do not use it with undelimited generators with it. Instead use methods such as *head* and *until* to limit the sequence.
 
 ### until(filter[, generatorInitialization...])
 Creates a generator that emits all the provided values until the specified *filter* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
@@ -154,10 +154,10 @@ Sequences.numbers().map((v) => -v).head(5).forEach((v) => console.log(v)); // 0,
 Creates a generator that emits all the provided items as-is, but transforms values returned to the generator by applying the *callback* function to them. The callback receives the value to be returned to the generator as an argument. In addition, the callback receives as a second argument the original value provided by the source generator.
 
 ### flatten()
-Converts a generator that also emits sequences (collections, generators and iteratos), into a generator of simple values.
+Converts a generator that also emits sequences (collections, generators and iterators), into a generator of simple values.
 ```javascript
 Sequences.toGenerator([1,[2,[3,[4,5]]]]).flatten().forEach((v) => console.log(v)); // 1, 2, 3, 4, 5
 ```
 
 ### loop([times])
-Given a generator that emits a finite seqeunce, creates a generator that loops over the sequnce specified number of *times*. If *times* isn't secified, the created generator will loop forever.
+Given a generator that emits a finite sequence, creates a generator that loops over the sequence specified number of *times*. If *times* isn't specified, the created generator will loop forever.
