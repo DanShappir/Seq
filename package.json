@@ -1,0 +1,31 @@
+{
+  "name": "Sequences",
+  "version": "0.0.2",
+  "description": "Iterator methods for JavaScript ES6 generators",
+  "main": "js/sequences.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DanShappir/Sequences.git"
+  },
+  "keywords": [
+    "es6",
+    "generator",
+    "iterator",
+    "forEach",
+    "filter",
+    "map",
+    "functional"
+  ],
+  "author": "Dan Shappir",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DanShappir/Sequences/issues"
+  },
+  "homepage": "https://github.com/DanShappir/Sequences"
+}
