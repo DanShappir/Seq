@@ -165,7 +165,7 @@ Given a generator that emits a finite sequence, creates a generator that loops o
 Sequences.toGenerator([1,2,3]).loop().head(10).forEach((v) => console.log(v)); // 1, 2, 3, 1, 2, 3, 1, 2, 3, 1
 ```
 
-### concat([s1 [, s2 [,s3 ...]]])
+### concat([s1 [, s2 [, s3 ...]]])
 Creates a generator that is the concatenation of the provided items and all the sequences provided as arguments.
 ```javascript
 Sequences.toGenerator([1,2,3]).concat(Sequences.toGenerator([7,8,9])).forEach((v) => console.log(v)); // 1, 2, 3, 7, 8, 9
@@ -178,5 +178,33 @@ Sequences.numbers().head(4).reduce((r, v) => r + v) // 6
 ```
 **Note:** since *reduce* cannot stop the iteration, do not use it with undelimited generators with it. Instead use methods such as *head* and *until* to limit the sequence.
 
-### combine([s1 [, s2 [,s3 ...]]])
+### combine([s1 [, s2 [, s3 ...]]])
 Creates a generator whose elements are arrays of the provided items and the items of all the sequences provided as arguments. Stops as soon as any of the input sequences is done.
+
+### tee ([f1 [, f2 [, f3 ...]]])
+Feeds the given sequence into the functions specified as arguments
+```javascript
+function isOdd(v) {
+    return v % 2;
+}
+
+Sequences.numbers().skip(10).head(10).tee(function (g) {
+    g.filter(isOdd).forEach(show); // 11, 13, 15, 17, 19
+}).exclude(isOdd).forEach(show); // 10, 12, 15, 16, 18
+```
+
+### indexOf(value[, fromIndex])
+Returns that index of the first item in the sequence that matches the given value, otherwise returns -1 if the value doesn't appear in the sequence. Optionally specify the index of the first item from which to start searching for the value.
+
+**Note:** since *indexOf* only stops when the value is found, be careful when using it with undelimited generators.
+
+### toArray()
+Returns an array containing all the items in the sequence.
+
+**Note:** since *toArray* takes all the items, do not use it with undelimited generators with it. Instead use methods such as *head* and *until* to limit the sequence.
+
+### use(callback)
+Creates an iterator for the given generator, and passes it as an argument to the specified callback. The result is the return value of the callback.
+```javascript
+var m = Sequences.numbers().head(10).combine(Sequences.numbers(-1, -1)).use((i) => new Map(i)); // map: 1 -> -1, 2 -> -2, ...
+```
