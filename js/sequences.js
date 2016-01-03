@@ -9,7 +9,7 @@ var Sequences;
     const numericArg = (arg, def) => {
         const result = Number(arg);
         return isNaN(result) ? def : result;
-    }
+    };
 
     Object.defineProperties(Sequences, {
         numbers: writable((initialValue, step) => {
@@ -24,7 +24,7 @@ var Sequences;
         }),
         toGenerator: writable((source, initialValue) => {
             if (source) {
-                if (typeof source === 'object' && iterSymbol in source) { // source has an iterator
+                if (typeof source === 'object' && iterSymbol in source) {
                     return function* () {
                         yield* source[iterSymbol]();
                     };
@@ -95,10 +95,10 @@ var Sequences;
             return function* (...args) {
                 const i = gen(...args);
                 let r;
-                while (true) {
+                for (let counter = 0; ; ++counter) {
                     const x = i.next(r);
-                    if (x.done || callback(x.value, r) === true) {
-                        break;
+                    if (x.done || callback(x.value, r, counter) === true) {
+                        return x.value;
                     }
                     r = yield x.value;
                 }
@@ -108,19 +108,7 @@ var Sequences;
             return this.until(not(Sequences.toFilter(filter)));
         }),
         head: writable(function (length) {
-            const gen = this;
-            length || (length = 1);
-            return function* (...args) {
-                const i = gen(...args);
-                let r;
-                for (let counter = 0; counter < length; ++counter) {
-                    const x = i.next(r);
-                    if (x.done) {
-                        break;
-                    }
-                    r = yield x.value;
-                }
-            };
+            return this.until((v, r, counter) => counter >= length);
         }),
         filter: writable(function (filter) {
             const gen = this;
@@ -140,7 +128,7 @@ var Sequences;
             const gen = this;
             if (typeof filter === 'number') {
                 const limit = filter;
-                filter = counter => counter <= limit;
+                filter = (x, counter) => counter <= limit;
             }
             return function* (...args) {
                 const callback = Sequences.toFilter(filter);
@@ -162,10 +150,11 @@ var Sequences;
                 let r;
                 while (true) {
                     const x = i.next(r);
+                    const v = callback(x.value, r);
                     if (x.done) {
-                        break;
+                        return v;
                     }
-                    r = yield callback(x.value, r);
+                    r = yield v;
                 }
             };
         }),
@@ -231,10 +220,11 @@ var Sequences;
                 var iters = gens.map(gen => gen(...args));
                 while (true) {
                     const nexts = iters.map(iter => iter.next());
+                    const results = nexts.map(r => r.value);
                     if (nexts.some(r => r.done)) {
-                        return;
+                        return results;
                     }
-                    yield nexts.map(r => r.value);
+                    yield results;
                 }
             };
         }),
@@ -243,8 +233,8 @@ var Sequences;
             return this;
         }),
         indexOf: writable(function (value, fromIndex, ...args) {
-            return this
-                .bind(this, ...args)
+            const gen = args.length ? this.bind(null, ...args) : this;
+            return gen
                 .combine(Sequences.numbers())
                 .skip(fromIndex)
                 .filter(v => v[0] === value)
