@@ -48,7 +48,12 @@ const sumNumbers = (...args) => {
 };
 console.log(sumNumbers(1, 2, 'hello', 3)); // outputs 6
 ```
-
+or
+```javascript
+Sequences.toGenerator(document.head.children)
+  .filter(elem => elem.tagName === 'SCRIPT')
+  .forEach(script => console.log(script.url))
+```
 ### Sequences.numbers([initialValue[, step])
 Helper function that returns a generator that emits a sequence of numbers, by default 0, 1, 2, ... You can optionally specify a start value as the *initialValue* first argument. By default the start value is 0. You can also specify a step size. By default the step size is 1.
 ```javascript
