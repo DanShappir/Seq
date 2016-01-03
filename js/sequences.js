@@ -24,11 +24,6 @@ var Sequences;
         }),
         toGenerator: writable((source, initialValue) => {
             if (source) {
-                if (typeof source.next === 'function') { // source is an iterator
-                    return function* () {
-                        yield* source;
-                    };
-                }
                 if (typeof source === 'object' && iterSymbol in source) { // source has an iterator
                     return function* () {
                         yield* source[iterSymbol]();
