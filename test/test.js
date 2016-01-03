@@ -3,27 +3,23 @@
  */
 (function () {
     'use strict';
-
-    function show(v) {
-        var div = document.createElement('div');
+    
+    const show = v => {
+        const div = document.createElement('div');
         div.textContent = v;
         document.body.appendChild(div);
-    }
+    };
 
-    var i = Sequences.toGenerator(['there', 'hello', 'there', 'world']).indexOf('there', 1);
+    let i = Sequences.toGenerator(['there', 'hello', 'there', 'world']).indexOf('there', 1);
     console.log('found:', i);
 
     Sequences.numbers().combine(Sequences.numbers(1), [2,3,4,5]).forEach(show);
 
     show('1 ---');
 
-    function isOdd(v) {
-        return v % 2;
-    }
+    const isOdd = v => v % 2;
 
-    Sequences.numbers().skip(10).head(10).tee(function (g) {
-        g.filter(isOdd).forEach(show);
-    }).exclude(isOdd).forEach(show);
+    Sequences.numbers().skip(10).head(10).tee(g => g.filter(isOdd).forEach(show)).exclude(isOdd).forEach(show);
 
     show('2 ---');
 
@@ -49,5 +45,5 @@
             v += (yield v) || v;
         }
     }
-    gen.head(10).forEach(function (v) { return show(v), v; }, 1);
+    gen.head(10).forEach(v => show(v), 1);
 }());
