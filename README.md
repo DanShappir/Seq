@@ -18,6 +18,8 @@ Now isn't that nice!
 
 As an interesting side-effect, the **Sequences** library essentially eliminates the need for explicitly using iterators, since all the iteration methods are applied directly on the generators.
 
+While **Sequences** iteration methods look very much like the built-in *Array.prototype* methods, there is one very significant difference between them: all the **Sequences** iteration methods are lazy evaluated. This means that only the values that are actually required are computed, on demand.
+
 ## Installation
 Simply use [Bower](http://bower.io/):
 
@@ -57,7 +59,7 @@ Sequences.toGenerator(document.head.children)
 ### Sequences.numbers([initialValue[, step])
 Helper function that returns a generator that emits a sequence of numbers, by default 0, 1, 2, ... You can optionally specify a start value as the *initialValue* first argument. By default the start value is 0. You can also specify a step size. By default the step size is 1.
 ```javascript
-console.log(Sequences.numbers(2, 2).head(5).toArray()); // outputs [2, 4, 6, 8, 10]
+console.log(...Sequences.numbers(2, 2).head(5)()); // outputs [2, 4, 6, 8, 10]
 ```
 The generator returned by *Sequences.numbers* can also receive an initial value and a step value. If specified, these values override any initial values provided to *Sequences.numbers* itself.
 
