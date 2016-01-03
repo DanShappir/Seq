@@ -105,7 +105,7 @@ function* generator() {
   yield 'hello';
 }
 console.log(generator.isGenerator()); // true
-console.log((function () {}).isGenerator('world')); // false
+console.log((function () {}).isGenerator()); // false
 ```
 
 ### forEach(callback[, generatorInitialization...])
@@ -130,7 +130,7 @@ Creates a generator that emits the first *length* provided items. If *length* is
 ### filter(filter)
 Creates a generator that emits all the provided items for which the specified *filter* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
 ```javascript
-Sequences.numbers().filter((v) => v % 2 === 0).head(5).forEach((v) => console.log(v)); // 0, 2, 4, 6, 8
+Sequences.numbers().filter(v => v % 2 === 0).head(5).forEach(v => console.log(v)); // 0, 2, 4, 6, 8
 ```
 
 ### exclude(filter)
@@ -139,13 +139,13 @@ Creates a generator that emits all the provided items for which the specified *f
 ### skip(filter)
 Creates a generator that emits all the provided items after the specified items are skipped. If the value provided as *filter* is a number then that number of items are skipped. Otherwise that value is used as a filter (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
 ```javascript
-Sequences.numbers().skip(3).head(5).forEach((v) => console.log(v)); // 3, 4, 5, 6, 7
+Sequences.numbers().skip(3).head(5).forEach(v => console.log(v)); // 3, 4, 5, 6, 7
 ```
 
 ### map(callback)
 Creates a generator that emits all the provided items as transformed by applying the *callback* function to them. The callback receives the current item as an argument. In addition to the current item, the callback receives as a second argument the value provided by the requesting iterator.
 ```javascript
-Sequences.numbers().map((v) => -v).head(5).forEach((v) => console.log(v)); // 0, -1, -2, -3, -4
+Sequences.numbers().map(v => -v).head(5).forEach(v => console.log(v)); // 0, -1, -2, -3, -4
 ```
 
 ### inverseMap(map)
@@ -154,19 +154,19 @@ Creates a generator that emits all the provided items as-is, but transforms valu
 ### flatten([depth])
 Converts a generator that also emits sequences (collections, generators and iterators), into a generator of simple values. The optional numeric depth argument specifies the level of flattening recursion. If not specified then a value of 0 is used, which means no recursion. For unlimited recursion specify a negative value.
 ```javascript
-Sequences.toGenerator([1,[2,[3,[4,5]]]]).flatten(-1).forEach((v) => console.log(v)); // 1, 2, 3, 4, 5
+Sequences.toGenerator([1,[2,[3,[4,5]]]]).flatten(-1).forEach(v => console.log(v)); // 1, 2, 3, 4, 5
 ```
 
 ### loop([times])
 Given a generator that emits a finite sequence, creates a generator that loops over the sequence specified number of *times*. If *times* isn't specified, the created generator will loop forever.
 ```javascript
-Sequences.toGenerator([1,2,3]).loop().head(10).forEach((v) => console.log(v)); // 1, 2, 3, 1, 2, 3, 1, 2, 3, 1
+Sequences.toGenerator([1,2,3]).loop().head(10).forEach(v => console.log(v)); // 1, 2, 3, 1, 2, 3, 1, 2, 3, 1
 ```
 
 ### concat([s1 [, s2 [, s3 ...]]])
 Creates a generator that is the concatenation of the provided items and all the sequences provided as arguments.
 ```javascript
-Sequences.toGenerator([1,2,3]).concat(Sequences.toGenerator([7,8,9])).forEach((v) => console.log(v)); // 1, 2, 3, 7, 8, 9
+Sequences.toGenerator([1,2,3]).concat(Sequences.toGenerator([7,8,9])).forEach(v => console.log(v)); // 1, 2, 3, 7, 8, 9
 ```
 
 ### reduce(callback [, seed])
@@ -182,13 +182,11 @@ Creates a generator whose elements are arrays of the provided items and the item
 ### tee ([f1 [, f2 [, f3 ...]]])
 Feeds the given sequence into the functions specified as arguments
 ```javascript
-function isOdd(v) {
-    return v % 2;
-}
+const isOdd = v => v % 2;
 
-Sequences.numbers().skip(10).head(10).tee(function (g) {
-    g.filter(isOdd).forEach(show); // 11, 13, 15, 17, 19
-}).exclude(isOdd).forEach(show); // 10, 12, 15, 16, 18
+Sequences.numbers().skip(10).head(10)
+    .tee(g => g.filter(isOdd).forEach(show)) // 11, 13, 15, 17, 19
+    .exclude(isOdd).forEach(show); // 10, 12, 15, 16, 18
 ```
 
 ### indexOf(value[, fromIndex])
@@ -196,13 +194,8 @@ Returns that index of the first item in the sequence that matches the given valu
 
 **Note:** since *indexOf* only stops when the value is found, be careful when using it with undelimited generators.
 
-### toArray()
-Returns an array containing all the items in the sequence.
-
-**Note:** since *toArray* takes all the items, do not use it with undelimited generators with it. Instead use methods such as *head* and *until* to limit the sequence.
-
 ### use(callback)
 Creates an iterator for the given generator, and passes it as an argument to the specified callback. The result is the return value of the callback.
 ```javascript
-var m = Sequences.numbers().head(10).combine(Sequences.numbers(-1, -1)).use((i) => new Map(i)); // map: 1 -> -1, 2 -> -2, ...
+var m = Sequences.numbers(1).head(10).combine(Sequences.numbers(-1, -1)).use(i => new Map(i)); // map: 1 -> -1, 2 -> -2, ...
 ```
