@@ -25,6 +25,8 @@ Simply use [Bower](http://bower.io/):
 2. Install the package: *bower install sequences*
 3. Referrence the file: *bower_components/sequences/js/sequences.js*
 
+For testing purposes, you can simply add the following script URL to your HTML file: [//rawgit.com/DanShappir/Sequences/master/js/sequences.js](//rawgit.com/DanShappir/Sequences/master/js/sequences.js).
+
 ## API
 The majority of the services provides by the **Sequences** library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods also return a generator instance, they can be chained together. In addition, several service functions are provided in the *Sequences* namespace.
 
