@@ -14,7 +14,7 @@ To list the first ten even numbers. Or alternatively:
 ```javascript
 numbers.filter(v => v % 2).head(10).forEach(console.log.bind(console));
 ```
-Now isn't that nice!
+Now isn't that nice! **And it's all implemented in less than 250 lines of unminified JavaScript code!**
 
 As an interesting side-effect, the **Sequences** library essentially eliminates the need for explicitly using iterators, since all the iteration methods are applied directly on the generators.
 
