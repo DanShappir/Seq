@@ -31,12 +31,11 @@ The majority of the services provides by the **Sequences** library are accessed 
 ### Sequences.toGenerator(source[, initialValue])
 This function accepts a single argument *source*, and transforms it into an appropriate generator. The following transformations rules are applied, in order:
 
-1. If the argument is an iterator, create a generator for it (yield\*)
-2. If the argument is a collection that has an iterator, create a generator for the iterator (yield\*)
-3. If the argument is already a generator, just return it
-4. If the argument is a function, create a generator that repeatdely invokes this function
-5. If the argument is a collection that doesn't have an iterator, create a generator that loops over the elements
-6. Otherwise create a simple generator that yields the provided argument
+1. If the argument has an iterator, create a generator for the iterator (yield\*)
+2. If the argument is already a generator, just return it
+3. If the argument is a function, create a generator that repeatdely invokes this function
+4. If the argument is a collection that doesn't have an iterator, create a generator that loops over the elements
+5. Otherwise create a simple generator that yields the provided argument
  
 Using *Sequences.toGenerator* enables you to apply the iteration methods on most any type of element, for example:
 ```javascript
