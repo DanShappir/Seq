@@ -40,11 +40,11 @@ This function accepts a single argument *source*, and transforms it into an appr
  
 Using *Sequences.toGenerator* enables you to apply the iteration methods on most any type of element, for example:
 ```javascript
-function sumNumbers(...args) {
+const sumNumbers = (...args) => {
   return Sequences.toGenerator(args)
     .filter(arg => typeof arg === 'number')
     .reduce((sum, arg) => sum + arg, 0);
-}
+};
 console.log(sumNumbers(1, 2, 'hello', 3)); // outputs 6
 ```
 
