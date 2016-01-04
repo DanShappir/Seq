@@ -30,7 +30,7 @@ Simply use [Bower](http://bower.io/):
 For testing purposes, you can simply add the following script URL to your HTML file: [//rawgit.com/DanShappir/Seq/master/js/seq.js](//rawgit.com/DanShappir/Seq/master/js/seq.js).
 
 ## API
-The majority of the services provides by the **Seq** library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods also return a generator instance, they can be chained together. In addition, several service functions are provided in the *Seq* namespace.
+The majority of the services provides by the **Seq** library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods also return a generator instance, they can be chained together. In addition, several service functions are provided in the *Seq* function / namespace.
 
 ### Seq(source)
 This function accepts a single argument *source*, and transforms it into an appropriate generator. The following transformations rules are applied, in order:
