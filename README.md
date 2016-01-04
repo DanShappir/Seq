@@ -14,7 +14,7 @@ To list the first ten even numbers. Or alternatively:
 ```javascript
 numbers.filter(v => v % 2).head(10).forEach(console.log.bind(console));
 ```
-Now isn't that nice! **And it's all implemented in less than 250 lines of unminified JavaScript code!**
+Now isn't that nice! **And it's all implemented in less than 260 lines of unminified JavaScript code!**
 
 As an interesting side-effect, the **Seq** library essentially eliminates the need for explicitly using iterators, since all the iteration methods are applied directly on the generators.
 
@@ -30,7 +30,7 @@ Simply use [Bower](http://bower.io/):
 For testing purposes, you can simply add the following script URL to your HTML file: [//rawgit.com/DanShappir/Seq/master/js/seq.js](//rawgit.com/DanShappir/Seq/master/js/seq.js).
 
 ## API
-The majority of the services provides by the **Seq** library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods also return a generator instance, they can be chained together. In addition, several service functions are provided in the *Sequences* namespace.
+The majority of the services provides by the **Seq** library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods also return a generator instance, they can be chained together. In addition, several service functions are provided in the *Seq* namespace.
 
 ### Seq(source)
 This function accepts a single argument *source*, and transforms it into an appropriate generator. The following transformations rules are applied, in order:
@@ -56,22 +56,22 @@ Seq(document.head.children)
   .filter(elem => elem.tagName === 'SCRIPT')
   .forEach(script => console.log(script.url))
 ```
-### Sequences.numbers([initialValue[, step])
+### Seq.numbers([initialValue[, step])
 Helper function that returns a generator that emits a sequence of numbers, by default 0, 1, 2, ... You can optionally specify a start value as the *initialValue* first argument. By default the start value is 0. You can also specify a step size. By default the step size is 1.
 ```javascript
 console.log(...Sequences.numbers(2, 2).head(5)()); // outputs [2, 4, 6, 8, 10]
 ```
 The generator returned by *Sequences.numbers* can also receive an initial value and a step value. If specified, these values override any initial values provided to *Sequences.numbers* itself.
 
-### Sequences.toFilter(value)
+### Seq.toFilter(value)
 Several of the API methods accept a filter argument. Often this will be a regular function (not a generator), in which case the specified filter works much the same way as callbacks provided to array iteration methods.
 ```javascript
-Sequences.numbers().head(10).filter((v) => v % 2).forEach((v) => console.log(v));
+Seq.numbers().head(10).filter((v) => v % 2).forEach((v) => console.log(v));
 ```
-In addition, filters that are not functions are also supporting, using the *Sequences.toFilter* helper function. This function is used to synthesize filters from additional types, using the following process:
+In addition, filters that are not functions are also supporting, using the *Seq.toFilter* helper function. This function is used to synthesize filters from additional types, using the following process:
 
 1. If the argument is a regular function (not a generator) then use it as described above
-2. Otherwise use *Sequences.toGenerator* to create a generator from the argument
+2. Otherwise use *Seq* to create a generator from the argument
 3. Create a filter function using that generator that tries to match its argument to all the generated values
 
 For example:
@@ -119,14 +119,14 @@ console.log((function () {}).isGenerator()); // false
 ### forEach(callback[, generatorInitialization...])
 Invoke the specified callback function for every item in the sequence. The callback receives the current item as an argument. If the callback returns a value, that value is provided back to the generator as the result of the *yield* instruction. Any additional optional arguments will be provided as arguments to the generator.
 ```javascript
-Sequences.numbers().head(5).forEach(v => console.log(v), null, 2); // 2, 3, 4, 5, 6
+Seq.numbers().head(5).forEach(v => console.log(v), null, 2); // 2, 3, 4, 5, 6
 ```
 **Note:** since *forEach* cannot stop the iteration, do not use it with undelimited generators with it. Instead use methods such as *head* and *until* to limit the sequence.
 
 ### until(filter[, generatorInitialization...])
 Creates a generator that emits all the provided values until the specified *filter* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
 ```javascript
-Sequences.numbers().until(v => v > 3).forEach(v => console.log(v)); // 0, 1, 2, 3
+Seq.numbers().until(v => v > 3).forEach(v => console.log(v)); // 0, 1, 2, 3
 ```
 
 ### asLongAs(filter[, generatorInitialization...])
