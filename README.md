@@ -1,6 +1,6 @@
-# Sequences
+# Seq
 ## Iteration methods for ES6 (JavaScript) Generators / Iterators
-After trying out ES6 generators and iterators, it occurred to me that their designers are not big fans of functional programming. Otherwise how can you explain the total lack of iteration functions, and the significant reliance on various incarnations of the *for* loop. But JavaScript is a highly malleable Programming Language, so I decided to add them myself. The result is the **Sequences** library that allows you to write code such as:
+After trying out ES6 generators and iterators, it occurred to me that their designers are not big fans of functional programming. Otherwise how can you explain the total lack of iteration functions, and the significant reliance on various incarnations of the *for* loop. But JavaScript is a highly malleable Programming Language, so I decided to add them myself. The result is the **Seq** library that allows you to write code such as:
 ```javascript
 function* numbers() {
   var n = 0;
@@ -16,9 +16,9 @@ numbers.filter(v => v % 2).head(10).forEach(console.log.bind(console));
 ```
 Now isn't that nice! **And it's all implemented in less than 250 lines of unminified JavaScript code!**
 
-As an interesting side-effect, the **Sequences** library essentially eliminates the need for explicitly using iterators, since all the iteration methods are applied directly on the generators.
+As an interesting side-effect, the **Seq** library essentially eliminates the need for explicitly using iterators, since all the iteration methods are applied directly on the generators.
 
-While **Sequences** iteration methods look very much like the built-in *Array.prototype* methods, there is one very significant difference between them: all the **Sequences** iteration methods are lazy evaluated. This means that only the values that are actually required are computed, on demand.
+While **Seq** iteration methods look very much like the built-in *Array.prototype* methods, there is one very significant difference between them: all the **Seq** iteration methods are lazy evaluated. This means that only the values that are actually required are computed, on demand.
 
 ## Installation
 Simply use [Bower](http://bower.io/):
@@ -27,12 +27,12 @@ Simply use [Bower](http://bower.io/):
 2. Install the package: *bower install sequences*
 3. Referrence the file: *bower_components/sequences/js/sequences.js*
 
-For testing purposes, you can simply add the following script URL to your HTML file: [//rawgit.com/DanShappir/Sequences/master/js/sequences.js](//rawgit.com/DanShappir/Sequences/master/js/sequences.js).
+For testing purposes, you can simply add the following script URL to your HTML file: [//rawgit.com/DanShappir/Seq/master/js/seq.js](//rawgit.com/DanShappir/Seq/master/js/seq.js).
 
 ## API
-The majority of the services provides by the **Sequences** library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods also return a generator instance, they can be chained together. In addition, several service functions are provided in the *Sequences* namespace.
+The majority of the services provides by the **Seq** library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods also return a generator instance, they can be chained together. In addition, several service functions are provided in the *Sequences* namespace.
 
-### Sequences.toGenerator(source[, initialValue])
+### Seq(source)
 This function accepts a single argument *source*, and transforms it into an appropriate generator. The following transformations rules are applied, in order:
 
 1. If the argument has an iterator, create a generator for the iterator (yield\*)
@@ -41,10 +41,10 @@ This function accepts a single argument *source*, and transforms it into an appr
 4. If the argument is a collection that doesn't have an iterator, create a generator that loops over the elements
 5. Otherwise create a simple generator that yields the provided argument
  
-Using *Sequences.toGenerator* enables you to apply the iteration methods on most any type of element, for example:
+Using *Seq* enables you to apply the iteration methods on most any type of element, for example:
 ```javascript
 const sumNumbers = (...args) => {
-  return Sequences.toGenerator(args)
+  return Seq(args)
     .filter(arg => typeof arg === 'number')
     .reduce((sum, arg) => sum + arg, 0);
 };
@@ -52,7 +52,7 @@ console.log(sumNumbers(1, 2, 'hello', 3)); // outputs 6
 ```
 or
 ```javascript
-Sequences.toGenerator(document.head.children)
+Seq(document.head.children)
   .filter(elem => elem.tagName === 'SCRIPT')
   .forEach(script => console.log(script.url))
 ```
