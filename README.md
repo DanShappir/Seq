@@ -59,9 +59,9 @@ Seq(document.head.children)
 ### Seq.numbers([initialValue[, step])
 Helper function that returns a generator that emits a sequence of numbers, by default 0, 1, 2, ... You can optionally specify a start value as the *initialValue* first argument. By default the start value is 0. You can also specify a step size. By default the step size is 1.
 ```javascript
-console.log(...Sequences.numbers(2, 2).head(5)()); // outputs [2, 4, 6, 8, 10]
+console.log(...Seq.numbers(2, 2).head(5)()); // outputs [2, 4, 6, 8, 10]
 ```
-The generator returned by *Sequences.numbers* can also receive an initial value and a step value. If specified, these values override any initial values provided to *Sequences.numbers* itself.
+The generator returned by *Seq.numbers* can also receive an initial value and a step value. If specified, these values override any initial values provided to *Seq.numbers* itself.
 
 ### Seq.toFilter(value)
 Several of the API methods accept a filter argument. Often this will be a regular function (not a generator), in which case the specified filter works much the same way as callbacks provided to array iteration methods.
@@ -96,9 +96,9 @@ var iter2 = generator(3); // 3, 4, 5, ...
 ```
 The iteration methods allow passing initialization parameters as extra arguments, for example:
 ```javascript
-generator.head(42).forEach(v => console.log(v), null, 5); // 5, 6, 7, ...
+generator.head(42).forEach(v => console.log(v), 5); // 5, 6, 7, ...
 ```
-*5* is the initialization parameter that is ultimately passed to *generator*. (The preceding *null* is the *this* value for the filter function.)
+*5* is the initialization parameter that is ultimately passed to *generator*.
 
 Since binding a generator returns a generator, the *bind* method can also be used to achieve the same effect:
 ```javascript
@@ -119,7 +119,7 @@ console.log((function () {}).isGenerator()); // false
 ### forEach(callback[, generatorInitialization...])
 Invoke the specified callback function for every item in the sequence. The callback receives the current item as an argument. If the callback returns a value, that value is provided back to the generator as the result of the *yield* instruction. Any additional optional arguments will be provided as arguments to the generator.
 ```javascript
-Seq.numbers().head(5).forEach(v => console.log(v), null, 2); // 2, 3, 4, 5, 6
+Seq.numbers().head(5).forEach(v => console.log(v), 2); // 2, 3, 4, 5, 6
 ```
 **Note:** since *forEach* cannot stop the iteration, do not use it with undelimited generators with it. Instead use methods such as *head* and *until* to limit the sequence.
 
@@ -138,7 +138,7 @@ Creates a generator that emits the first *length* provided items. If *length* is
 ### filter(filter)
 Creates a generator that emits all the provided items for which the specified *filter* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
 ```javascript
-Sequences.numbers().filter(v => v % 2 === 0).head(5).forEach(v => console.log(v)); // 0, 2, 4, 6, 8
+Seq.numbers().filter(v => v % 2 === 0).head(5).forEach(v => console.log(v)); // 0, 2, 4, 6, 8
 ```
 
 ### exclude(filter)
@@ -147,13 +147,13 @@ Creates a generator that emits all the provided items for which the specified *f
 ### skip(filter)
 Creates a generator that emits all the provided items after the specified items are skipped. If the value provided as *filter* is a number then that number of items are skipped. Otherwise that value is used as a filter (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
 ```javascript
-Sequences.numbers().skip(3).head(5).forEach(v => console.log(v)); // 3, 4, 5, 6, 7
+Seq.numbers().skip(3).head(5).forEach(v => console.log(v)); // 3, 4, 5, 6, 7
 ```
 
 ### map(callback)
 Creates a generator that emits all the provided items as transformed by applying the *callback* function to them. The callback receives the current item as an argument. In addition to the current item, the callback receives as a second argument the value provided by the requesting iterator.
 ```javascript
-Sequences.numbers().map(v => -v).head(5).forEach(v => console.log(v)); // 0, -1, -2, -3, -4
+Seq.numbers().map(v => -v).head(5).forEach(v => console.log(v)); // 0, -1, -2, -3, -4
 ```
 
 ### inverseMap(map)
@@ -162,25 +162,25 @@ Creates a generator that emits all the provided items as-is, but transforms valu
 ### flatten([depth])
 Converts a generator that also emits sequences (collections, generators and iterators), into a generator of simple values. The optional numeric depth argument specifies the level of flattening recursion. If not specified then a value of 0 is used, which means no recursion. For unlimited recursion specify a negative value.
 ```javascript
-Sequences.toGenerator([1,[2,[3,[4,5]]]]).flatten(-1).forEach(v => console.log(v)); // 1, 2, 3, 4, 5
+Seq([1,[2,[3,[4,5]]]]).flatten(-1).forEach(v => console.log(v)); // 1, 2, 3, 4, 5
 ```
 
 ### loop([times])
 Given a generator that emits a finite sequence, creates a generator that loops over the sequence specified number of *times*. If *times* isn't specified, the created generator will loop forever.
 ```javascript
-Sequences.toGenerator([1,2,3]).loop().head(10).forEach(v => console.log(v)); // 1, 2, 3, 1, 2, 3, 1, 2, 3, 1
+Seq([1,2,3]).loop().head(10).forEach(v => console.log(v)); // 1, 2, 3, 1, 2, 3, 1, 2, 3, 1
 ```
 
 ### concat([s1 [, s2 [, s3 ...]]])
 Creates a generator that is the concatenation of the provided items and all the sequences provided as arguments.
 ```javascript
-Sequences.toGenerator([1,2,3]).concat(Sequences.toGenerator([7,8,9])).forEach(v => console.log(v)); // 1, 2, 3, 7, 8, 9
+Seq([1,2,3]).concat(Seq([7,8,9])).forEach(v => console.log(v)); // 1, 2, 3, 7, 8, 9
 ```
 
 ### reduce(callback [, seed])
 Similar to *Array.reduce* converts a sequence into a value by applying the callback function to previous result and the current element. The optional seed value specifies the result value to pass to the first callback invocation. If not specified *undefined* is used.
 ```javascript
-Sequences.numbers().head(4).reduce((r, v) => r + v) // 6
+Seq.numbers().head(4).reduce((r, v) => r + v) // 6
 ```
 **Note:** since *reduce* cannot stop the iteration, do not use it with undelimited generators with it. Instead use methods such as *head* and *until* to limit the sequence.
 
@@ -192,7 +192,7 @@ Feeds the given sequence into the functions specified as arguments
 ```javascript
 const isOdd = v => v % 2;
 
-Sequences.numbers().skip(10).head(10)
+Seq.numbers().skip(10).head(10)
     .tee(g => g.filter(isOdd).forEach(show)) // 11, 13, 15, 17, 19
     .exclude(isOdd).forEach(show); // 10, 12, 15, 16, 18
 ```
@@ -205,5 +205,5 @@ Returns that index of the first item in the sequence that matches the given valu
 ### use(callback)
 Creates an iterator for the given generator, and passes it as an argument to the specified callback. The result is the return value of the callback.
 ```javascript
-var m = Sequences.numbers(1).head(10).combine(Sequences.numbers(-1, -1)).use(i => new Map(i)); // map: 1 -> -1, 2 -> -2, ...
+var m = Seq.numbers(1).head(10).combine(Seq.numbers(-1, -1)).use(i => new Map(i)); // map: 1 -> -1, 2 -> -2, ...
 ```
