@@ -79,13 +79,7 @@
     
     const not = func => (...args) => !func(...args);
 
-    const bind = Function.prototype.bind;
     Object.defineProperties(proto, {
-        bind: writable(function (...args) {
-            const result = bind.apply(this, args);
-            Object.setPrototypeOf(result, proto);
-            return result;
-        }),
         forEach: writable(function (callback, ...args) {
             const i = this(...args);
             let r;
