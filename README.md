@@ -66,7 +66,7 @@ The generator returned by *Seq.numbers* can also receive an initial value and a 
 ### Seq.toFilter(value)
 Several of the API methods accept a filter argument. Often this will be a regular function (not a generator), in which case the specified filter works much the same way as callbacks provided to array iteration methods.
 ```javascript
-Seq.numbers().head(10).filter((v) => v % 2).forEach((v) => console.log(v));
+Seq.numbers().head(10).filter(v => v % 2).forEach(v => console.log(v));
 ```
 In addition, filters that are not functions are also supporting, using the *Seq.toFilter* helper function. This function is used to synthesize filters from additional types, using the following process:
 
@@ -85,34 +85,32 @@ will display all the values provided by generator *g*, until *g* generates one o
 ### Initialization
 Generators can receive arguments, just like a regular function, and use these arguments to calculate the generated sequence, for example:
 ```javascript
-function* generator(init) {
-  var v = init || 0;
+function* gen(init) {
   while (true) {
     yield v++;
   }
 }
-var iter1 = generator(1); // 1, 2. 3, ...
-var iter2 = generator(3); // 3, 4, 5, ...
+var iter1 = gen(1); // 1, 2. 3, ...
+var iter2 = gen(3); // 3, 4, 5, ...
 ```
 The iteration methods allow passing initialization parameters as extra arguments, for example:
 ```javascript
-generator.head(42).forEach(v => console.log(v), 5); // 5, 6, 7, ...
+gen.head(42).forEach(v => console.log(v), 5); // 5, 6, 7, ...
 ```
-*5* is the initialization parameter that is ultimately passed to *generator*.
+*5* is the initialization parameter that is ultimately passed to *gen*.
 
 Since binding a generator returns a generator, the *bind* method can also be used to achieve the same effect:
 ```javascript
-generator.head(42).bind(null, 5).forEach((v) => console.log(v)); // 5, 6, 7, ...
+gen.bind(null, 5).head(42).forEach(v => console.log(v)); // 5, 6, 7, ...
 ```
 
 ## Iteration methods
 ### isGenerator()
-Polyfill for a method that is currently only available in Firefox. returns *true* invoked for a generator, and *false* otherwise. Unlike standard behavior in Firefox, this implementation of isGenerator also return true for bound generators.
-```javascript
-function* generator() {
+Polyfill for a method that is currently only available in Firefox. returns *true* invoked for a generator, and *false* otherwise. ```javascript
+function* gen() {
   yield 'hello';
 }
-console.log(generator.isGenerator()); // true
+console.log(gen.isGenerator()); // true
 console.log((function () {}).isGenerator()); // false
 ```
 
@@ -121,7 +119,7 @@ Invoke the specified callback function for every item in the sequence. The callb
 ```javascript
 Seq.numbers().head(5).forEach(v => console.log(v), 2); // 2, 3, 4, 5, 6
 ```
-**Note:** since *forEach* cannot stop the iteration, do not use it with undelimited generators with it. Instead use methods such as *head* and *until* to limit the sequence.
+**Note:** since *forEach* cannot stop the iteration, do not use it with undelimited generators. Instead use methods such as *head* and *until* to limit the sequence.
 
 ### until(filter[, generatorInitialization...])
 Creates a generator that emits all the provided values until the specified *filter* returns *true* (see [filters](#filters) section for details). If you pass arguments to the created generator, they will be passed on as-is to the original generator.
