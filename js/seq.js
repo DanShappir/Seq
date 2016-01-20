@@ -1,6 +1,5 @@
 (function(name, definition) {
     'use strict';
-    
     if (typeof module !== 'undefined') {
         module.exports = definition();
     } else if (typeof define === 'function' && typeof define.amd === 'object') {
