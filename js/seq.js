@@ -246,6 +246,5 @@
             return callback(this(...args));
         })
     });
-    
     return Seq;
 }));
