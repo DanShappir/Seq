@@ -14,13 +14,13 @@ To list the first ten even numbers. Or alternatively:
 ```javascript
 numbers.filter(v => v % 2).head(10).forEach(console.log.bind(console));
 ```
-Now isn't that nice! **And it's all implemented in less than 260 lines of unminified JavaScript code!**
+Now isn't that nice! **And it's all implemented in 250 lines of unminified JavaScript code!**
 
 As an interesting side-effect, the **Seq** library essentially eliminates the need for explicitly using iterators, since all the iteration methods are applied directly on the generators.
 
 While **Seq** iteration methods look very much like the built-in *Array.prototype* methods, there is one very significant difference between them: all the **Seq** iteration methods are lazy evaluated. This means that only the values that are actually required are computed, on demand.
 
-## Installation
+## Installation and Usage
 Simply use [Bower](http://bower.io/):
 
 1. Install Bower: *npm install -g bower*
@@ -28,6 +28,8 @@ Simply use [Bower](http://bower.io/):
 3. Referrence the file: *bower_components/sequences/js/sequences.js*
 
 For testing purposes, you can simply add the following script URL to your HTML file: [//rawgit.com/DanShappir/Seq/master/js/seq.js](//rawgit.com/DanShappir/Seq/master/js/seq.js).
+
+The library is implemented as a universal package that can be used with **CommonJS*, as **AMD** (with **RequireJS**), or simply referenced via a <script> tag.
 
 ## API
 The majority of the services provides by the **Seq** library are accessed as iteration methods implemented on the generator prototype. This means the services are available as methods you can invoke directly on generator instances. Since most of these methods also return a generator instance, they can be chained together. In addition, several service functions are provided in the *Seq* function / namespace.
